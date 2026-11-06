@@ -38,9 +38,8 @@
 
     <section class="panel">
       <h2>Link für die Gruppe</h2>
-      <p class="hint">Diesen Link in WhatsApp teilen. Bestellungen werden gespeichert, auch wenn dein Handy aus ist.</p>
       <div class="share-box">
-        <input id="shareLink" readonly />
+        <input id="shareLink" readonly value="Donnerstag_Essen" />
         <button class="btn btn-ghost" id="copyLink" type="button">Kopieren</button>
         <button class="btn btn-ghost" id="shareNative" type="button">Teilen</button>
       </div>
@@ -49,10 +48,10 @@
 
   <script type="module">
     import {
-      loadHostKey, euro, joinUrl, settingsUrl,
+      loadHostKey, euro, settingsUrl, groupShareUrl, GROUP_LINK_NAME,
       buildWhatsAppText, whatsappLink, setStatus
     } from "./js/shared.js";
-    import { watchRound, removeOrder } from "./js/store.js";
+    import { watchRound, removeOrder, setActiveRound } from "./js/store.js";
 
     const params = new URLSearchParams(location.search);
     const id = params.get("r");
@@ -70,8 +69,8 @@
     function render(round) {
       current = round;
       document.getElementById("liveText").textContent = "Cloud verbunden";
-      document.getElementById("heading").textContent = round.title || "Mittag am Donnerstag";
-      document.getElementById("shareLink").value = joinUrl(round.id);
+      document.getElementById("heading").textContent = round.title || GROUP_LINK_NAME;
+      document.getElementById("shareLink").value = GROUP_LINK_NAME;
       document.getElementById("count").textContent = String((round.orders || []).length);
       document.getElementById("people").textContent = String(new Set((round.orders || []).map((o) => o.slogan)).size);
       document.getElementById("total").textContent = euro(round.total);
@@ -127,17 +126,17 @@
     }
 
     document.getElementById("copyLink").addEventListener("click", async () => {
-      await navigator.clipboard.writeText(document.getElementById("shareLink").value);
-      setStatus(status, "Link kopiert.");
+      await navigator.clipboard.writeText(groupShareUrl());
+      setStatus(status, "Donnerstag_Essen kopiert.");
     });
 
     document.getElementById("shareNative").addEventListener("click", async () => {
-      const link = document.getElementById("shareLink").value;
+      const link = groupShareUrl();
       if (navigator.share) {
-        await navigator.share({ title: "Mittag am Donnerstag", text: "Mittag am Donnerstag – hier bestellen:", url: link });
+        await navigator.share({ url: link });
       } else {
         await navigator.clipboard.writeText(link);
-        setStatus(status, "Link kopiert.");
+        setStatus(status, "Donnerstag_Essen kopiert.");
       }
     });
 
@@ -156,6 +155,7 @@
       location.href = whatsappLink(current.whatsapp, buildWhatsAppText(current));
     });
 
+    setActiveRound(id).catch(() => {});
     watchRound(id, render, (error) => {
       document.getElementById("liveText").textContent = "Fehler";
       setStatus(status, error.message, true);

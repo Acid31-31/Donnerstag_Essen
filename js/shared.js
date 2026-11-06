@@ -130,16 +130,30 @@ export function whatsappLink(phone, text) {
   return `https://wa.me/${normalized}?text=${encoded}`;
 }
 
+export const GROUP_LINK_NAME = "Donnerstag_Essen";
+
+export function siteBase() {
+  return `${location.origin}${location.pathname.replace(/[^/]*$/, "")}`;
+}
+
+export function groupShareUrl() {
+  return siteBase();
+}
+
 export function joinUrl(id) {
-  return `${location.origin}${location.pathname.replace(/[^/]*$/, "")}join.html?r=${encodeURIComponent(id)}`;
+  return `${siteBase()}join.html?r=${encodeURIComponent(id)}`;
 }
 
 export function hostUrl(id) {
-  return `${location.origin}${location.pathname.replace(/[^/]*$/, "")}host.html?r=${encodeURIComponent(id)}`;
+  return `${siteBase()}host.html?r=${encodeURIComponent(id)}`;
 }
 
 export function settingsUrl(id) {
-  return `${location.origin}${location.pathname.replace(/[^/]*$/, "")}settings.html?r=${encodeURIComponent(id)}`;
+  return `${siteBase()}settings.html?r=${encodeURIComponent(id)}`;
+}
+
+export function startUrl() {
+  return `${siteBase()}start.html`;
 }
 
 export function setStatus(el, message, isError = false) {

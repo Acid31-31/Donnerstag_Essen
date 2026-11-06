@@ -27,12 +27,25 @@ async function dbFetch(path, options = {}) {
   return JSON.parse(text);
 }
 
+export async function setActiveRound(id) {
+  await dbFetch(`/rounds/_active.json`, {
+    method: "PUT",
+    body: JSON.stringify({ id: String(id), updatedAt: new Date().toISOString() })
+  });
+}
+
+export async function getActiveRoundId() {
+  const data = await dbFetch(`/rounds/_active.json`);
+  return data && data.id ? String(data.id) : "";
+}
+
 export async function createRound(title) {
   const round = emptyRound(title);
   await dbFetch(`/rounds/${round.id}.json`, {
     method: "PUT",
     body: JSON.stringify(round)
   });
+  await setActiveRound(round.id);
   return withTotals(round);
 }
 
