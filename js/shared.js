@@ -222,3 +222,29 @@ export function sendAndWait(conn, message, expectType, timeoutMs = 10000) {
     conn.send(message);
   });
 }
+
+/** KNX-Visu Daten-Spalten im Hintergrund (wie STEUERUNG). */
+export function installKnxChrome() {
+  if (document.querySelector(".knx-stream")) return;
+  const tags = ["SENS", "TEMP", "KNX", "BUS", "GRP", "ACT", "PWM", "DEV", "LINK", "SYNC", "DATA", "NODE", "ROOM", "HVAC", "STAT"];
+  const lines = Array.from({ length: 48 }, () => {
+    const tag = tags[Math.floor(Math.random() * tags.length)];
+    const hex = Math.floor(Math.random() * 0xffffff).toString(16).toUpperCase().padStart(6, "0");
+    return `${tag} ${hex}`;
+  }).join("\n");
+  const block = `${lines}\n${lines}`;
+  for (const side of ["left", "right"]) {
+    const el = document.createElement("div");
+    el.className = `knx-stream ${side}`;
+    el.innerHTML = `<span class="track">${block}\n${block}</span>`;
+    document.body.prepend(el);
+  }
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => installKnxChrome());
+  } else {
+    installKnxChrome();
+  }
+}
