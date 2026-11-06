@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="css/app.css?v=hud3" />
 </head>
 <body>
   <main class="shell">
@@ -16,7 +16,7 @@
         <div class="brand-mark">DE</div>
         <div>
           <h1 id="heading">DONNERSTAG_ESSEN</h1>
-          <p>Dein Essen · dein Slogan</p>
+          <p>// UNIT ORDER · YOUR TAG</p>
         </div>
       </div>
       <div class="live-pill">LIVE</div>
@@ -24,10 +24,10 @@
 
     <section class="panel">
       <h2>Deine Bestellung</h2>
-      <p class="hint" id="meta">Wird in der Cloud gespeichert. Der Gastgeber sieht sie später auch bei ausgeschaltetem Handy.</p>
+      <p class="hint" id="meta">Cloud-Sync aktiv · Gastgeber sieht Bestellungen live.</p>
 
       <div class="field">
-        <label for="slogan">Dein Slogan / Name</label>
+        <label for="slogan">Slogan / Name</label>
         <input id="slogan" maxlength="60" placeholder="z. B. Tom – ohne Zwiebeln" />
       </div>
 
@@ -36,7 +36,7 @@
         <button class="btn btn-ghost" id="addItem" type="button">Gericht hinzufügen</button>
       </div>
 
-      <div class="total-bar"><span>Deine Summe</span><span id="subtotal">0,00 €</span></div>
+      <div class="total-bar"><span>Summe</span><span id="subtotal">0,00 €</span></div>
 
       <div class="actions">
         <button class="btn btn-primary" id="send" type="button">Senden</button>
@@ -46,7 +46,7 @@
 
     <section class="panel" id="done" hidden>
       <h2>Gesendet</h2>
-      <p class="hint">Deine Bestellung ist gespeichert.</p>
+      <p class="hint">Signal gespeichert · Bestellung in der Cloud.</p>
       <div class="actions">
         <button class="btn btn-ghost" id="again" type="button">Noch etwas bestellen</button>
       </div>
