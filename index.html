@@ -3,30 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Donnerstag_Essen</title>
+  <title>Essen bestellen</title>
+  <meta name="description" content="Essen bestellen" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Essen bestellen" />
+  <meta property="og:description" content="Tippen und bestellen" />
+  <meta property="og:url" content="https://acid31-31.github.io/Donnerstag_Essen/" />
+  <meta property="og:image" content="https://acid31-31.github.io/Donnerstag_Essen/essen-bestellen-button.jpg" />
+  <meta property="og:image:width" content="1280" />
+  <meta property="og:image:height" content="720" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Essen bestellen" />
+  <meta name="twitter:image" content="https://acid31-31.github.io/Donnerstag_Essen/essen-bestellen-button.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .gate {
+      min-height: 70vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+    .gate a.cta {
+      display: block;
+      max-width: min(520px, 92vw);
+      border: 0;
+      background: none;
+      padding: 0;
+      filter: drop-shadow(0 18px 40px rgba(60, 231, 255, 0.28));
+      transition: transform 0.18s ease;
+    }
+    .gate a.cta:active { transform: scale(0.98); }
+    .gate img {
+      width: 100%;
+      height: auto;
+      border-radius: 18px;
+    }
+    .gate .hint { margin-top: 18px; }
+  </style>
 </head>
 <body>
-  <main class="shell">
-    <section class="panel">
-      <h2>Donnerstag_Essen</h2>
+  <main class="shell gate">
+    <div>
+      <a class="cta" id="cta" href="#">
+        <img src="essen-bestellen-button.jpg" alt="Essen bestellen" />
+      </a>
       <p class="hint" id="status">Wird geladen…</p>
-    </section>
+    </div>
   </main>
   <script type="module">
     import { joinUrl, startUrl, setStatus } from "./js/shared.js";
     import { getActiveRoundId } from "./js/store.js";
 
     const status = document.getElementById("status");
+    const cta = document.getElementById("cta");
+
     getActiveRoundId()
       .then((id) => {
         if (id) {
-          location.replace(joinUrl(id));
+          const target = joinUrl(id);
+          cta.href = target;
+          status.textContent = "Tippen zum Bestellen";
+          // Direkt zur Bestellung, wenn schon eine Runde offen ist
+          location.replace(target);
           return;
         }
+        cta.href = startUrl();
         status.innerHTML = `Noch keine offene Bestellung.<br><a href="${startUrl()}">Als Gastgeber starten</a>`;
       })
       .catch((error) => setStatus(status, error.message, true));
