@@ -141,7 +141,7 @@ export function groupShareUrl() {
 }
 
 export function joinUrl(id) {
-  return `${siteBase()}join.html?r=${encodeURIComponent(id)}`;
+  return `${siteBase()}bestellen.html?r=${encodeURIComponent(id)}`;
 }
 
 export function hostUrl(id) {
