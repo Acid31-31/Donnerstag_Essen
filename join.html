@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bestellen · Bestellrunde</title>
+  <title>Bestellen · Mittag am Donnerstag</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -14,7 +14,7 @@
     <div class="brand">
       <div class="brand-mark">BR</div>
       <div>
-        <h1 id="heading">Bestellrunde</h1>
+        <h1 id="heading">Mittag am Donnerstag</h1>
         <p>Dein Essen · dein Slogan</p>
       </div>
     </div>
@@ -141,7 +141,7 @@
     });
 
     getRound(id).then((round) => {
-      document.getElementById("heading").textContent = round.title || "Bestellrunde";
+      document.getElementById("heading").textContent = round.title || "Mittag am Donnerstag";
       const bits = [];
       if (round.deliveryTime) bits.push(`Lieferzeit: ${round.deliveryTime}`);
       if (round.address) bits.push(String(round.address).split("\n")[0]);

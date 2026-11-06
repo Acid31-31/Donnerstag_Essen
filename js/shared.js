@@ -19,10 +19,10 @@ export function newId(size = 8) {
   return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }
 
-export function emptyRound(title = "Büro Mittag") {
+export function emptyRound(title = "Mittag am Donnerstag") {
   return {
     id: newId(8),
-    title: String(title || "Büro Mittag").trim().slice(0, 80) || "Büro Mittag",
+    title: String(title || "Mittag am Donnerstag").trim().slice(0, 80) || "Mittag am Donnerstag",
     address: "",
     deliveryTime: "",
     whatsapp: "",

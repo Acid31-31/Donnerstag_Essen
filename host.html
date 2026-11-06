@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gastgeber · Bestellrunde</title>
+  <title>Gastgeber · Mittag am Donnerstag</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -14,7 +14,7 @@
     <div class="brand">
       <div class="brand-mark">BR</div>
       <div style="flex:1">
-        <h1 id="heading">Bestellrunde</h1>
+        <h1 id="heading">Mittag am Donnerstag</h1>
         <p>Gastgeber-Ansicht · Cloud</p>
       </div>
       <a class="btn btn-ghost btn-small" id="openSettings" href="#">Einstellungen</a>
@@ -70,7 +70,7 @@
     function render(round) {
       current = round;
       document.getElementById("liveText").textContent = "Cloud verbunden";
-      document.getElementById("heading").textContent = round.title || "Bestellrunde";
+      document.getElementById("heading").textContent = round.title || "Mittag am Donnerstag";
       document.getElementById("shareLink").value = joinUrl(round.id);
       document.getElementById("count").textContent = String((round.orders || []).length);
       document.getElementById("people").textContent = String(new Set((round.orders || []).map((o) => o.slogan)).size);
@@ -134,7 +134,7 @@
     document.getElementById("shareNative").addEventListener("click", async () => {
       const link = document.getElementById("shareLink").value;
       if (navigator.share) {
-        await navigator.share({ title: "Bestellrunde", text: "Hier kannst du dein Essen bestellen:", url: link });
+        await navigator.share({ title: "Mittag am Donnerstag", text: "Mittag am Donnerstag – hier bestellen:", url: link });
       } else {
         await navigator.clipboard.writeText(link);
         setStatus(status, "Link kopiert.");
