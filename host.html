@@ -15,7 +15,7 @@
       <div class="brand-mark">BR</div>
       <div style="flex:1">
         <h1 id="heading">Bestellrunde</h1>
-        <p>Gastgeber-Ansicht · Live</p>
+        <p>Gastgeber-Ansicht · Cloud</p>
       </div>
       <a class="btn btn-ghost btn-small" id="openSettings" href="#">Einstellungen</a>
     </div>
@@ -26,7 +26,7 @@
         <div class="stat"><span>Personen</span><strong id="people">0</strong></div>
         <div class="stat"><span>Gesamtsumme</span><strong id="total">0,00 €</strong></div>
       </div>
-      <div class="pill" id="livePill"><span class="dot"></span> <span id="liveText">Verbinde…</span></div>
+      <div class="pill"><span class="dot"></span> <span id="liveText">Lade…</span></div>
       <div id="orders" class="empty">Noch keine Bestellungen. Link in die Gruppe schicken.</div>
       <div class="total-bar"><span>Gesamt</span><span id="totalBar">0,00 €</span></div>
       <div class="actions">
@@ -38,7 +38,7 @@
 
     <section class="panel">
       <h2>Link für die Gruppe</h2>
-      <p class="hint">Diesen Link in WhatsApp teilen. Diese Seite muss während der Bestellung offen bleiben.</p>
+      <p class="hint">Diesen Link in WhatsApp teilen. Bestellungen werden gespeichert, auch wenn dein Handy aus ist.</p>
       <div class="share-box">
         <input id="shareLink" readonly />
         <button class="btn btn-ghost" id="copyLink" type="button">Kopieren</button>
@@ -49,43 +49,43 @@
 
   <script type="module">
     import {
-      loadHostKey, loadRound, saveRound, euro, joinUrl, settingsUrl,
-      buildWhatsAppText, whatsappLink, setStatus, createPeer, withTotals, newId
+      loadHostKey, euro, joinUrl, settingsUrl,
+      buildWhatsAppText, whatsappLink, setStatus
     } from "./js/shared.js";
+    import { watchRound, removeOrder } from "./js/store.js";
 
     const params = new URLSearchParams(location.search);
     const id = params.get("r");
     const hostKey = loadHostKey(id || "");
     const status = document.getElementById("status");
     let current = null;
-    const connections = new Set();
 
     if (!id) location.href = "./";
-    if (!hostKey) {
-      setStatus(status, "Diese Ansicht ist nur auf dem Handy des Gastgebers verfügbar.", true);
-    }
-
     document.getElementById("openSettings").href = settingsUrl(id);
 
+    if (!hostKey) {
+      setStatus(status, "Einstellungen und Löschen nur auf dem Handy, mit dem die Runde gestartet wurde.", false);
+    }
+
     function render(round) {
-      current = withTotals(round);
-      saveRound(current);
-      document.getElementById("heading").textContent = current.title || "Bestellrunde";
-      document.getElementById("shareLink").value = joinUrl(current.id);
-      document.getElementById("count").textContent = String((current.orders || []).length);
-      document.getElementById("people").textContent = String(new Set((current.orders || []).map((o) => o.slogan)).size);
-      document.getElementById("total").textContent = euro(current.total);
-      document.getElementById("totalBar").textContent = euro(current.total);
+      current = round;
+      document.getElementById("liveText").textContent = "Cloud verbunden";
+      document.getElementById("heading").textContent = round.title || "Bestellrunde";
+      document.getElementById("shareLink").value = joinUrl(round.id);
+      document.getElementById("count").textContent = String((round.orders || []).length);
+      document.getElementById("people").textContent = String(new Set((round.orders || []).map((o) => o.slogan)).size);
+      document.getElementById("total").textContent = euro(round.total);
+      document.getElementById("totalBar").textContent = euro(round.total);
 
       const box = document.getElementById("orders");
-      if (!(current.orders || []).length) {
+      if (!(round.orders || []).length) {
         box.className = "empty";
         box.textContent = "Noch keine Bestellungen. Link in die Gruppe schicken.";
         return;
       }
 
       box.className = "";
-      box.innerHTML = current.orders.map((order) => `
+      box.innerHTML = round.orders.map((order) => `
         <article class="order-card">
           <header>
             <h3>${escapeHtml(order.slogan)}</h3>
@@ -102,17 +102,18 @@
               </li>
             `).join("")}
           </ul>
-          <div class="actions">
-            <button class="btn btn-danger btn-small" data-delete="${order.id}" type="button">Entfernen</button>
-          </div>
+          ${hostKey ? `<div class="actions"><button class="btn btn-danger btn-small" data-delete="${order.id}" type="button">Entfernen</button></div>` : ""}
         </article>
       `).join("");
 
       box.querySelectorAll("[data-delete]").forEach((button) => {
-        button.addEventListener("click", () => {
-          current.orders = current.orders.filter((order) => order.id !== button.getAttribute("data-delete"));
-          render(current);
-          setStatus(status, "Bestellung entfernt.");
+        button.addEventListener("click", async () => {
+          try {
+            await removeOrder(id, button.getAttribute("data-delete"));
+            setStatus(status, "Bestellung entfernt.");
+          } catch (error) {
+            setStatus(status, error.message, true);
+          }
         });
       });
     }
@@ -123,67 +124,6 @@
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;");
-    }
-
-    function handleMessage(conn, data) {
-      if (!data || !data.type) return;
-      if (data.type === "hello") {
-        conn.send({ type: "state", round: withTotals(current) });
-        return;
-      }
-      if (data.type === "order") {
-        const slogan = String(data.slogan || "").trim().slice(0, 60);
-        const items = Array.isArray(data.items) ? data.items : [];
-        const cleanItems = items
-          .map((item) => ({
-            name: String(item.name || "").trim().slice(0, 80),
-            qty: Math.max(1, Math.min(99, Number(item.qty) || 1)),
-            price: Math.max(0, Number(item.price) || 0),
-            note: String(item.note || "").trim().slice(0, 160)
-          }))
-          .filter((item) => item.name);
-        if (!slogan || !cleanItems.length) {
-          conn.send({ type: "error", error: "Bestellung unvollständig" });
-          return;
-        }
-        current.orders.push({
-          id: newId(8),
-          slogan,
-          items: cleanItems,
-          createdAt: new Date().toISOString()
-        });
-        render(current);
-        conn.send({ type: "ok", round: withTotals(current) });
-        setStatus(status, `Neue Bestellung von ${slogan}`);
-      }
-    }
-
-    async function startHost() {
-      current = loadRound(id) || null;
-      if (!current) {
-        setStatus(status, "Runde nicht gefunden. Bitte neu erstellen.", true);
-        return;
-      }
-      render(current);
-      try {
-        const peer = await createPeer(id);
-        document.getElementById("liveText").textContent = "Bereit für Bestellungen";
-        peer.on("connection", (conn) => {
-          connections.add(conn);
-          conn.on("data", (data) => handleMessage(conn, data));
-          conn.on("close", () => connections.delete(conn));
-        });
-        peer.on("disconnected", () => {
-          document.getElementById("liveText").textContent = "Verbindung getrennt – Seite offen lassen";
-          peer.reconnect();
-        });
-        peer.on("error", (error) => {
-          setStatus(status, error.message || "Verbindungsfehler", true);
-        });
-      } catch (error) {
-        document.getElementById("liveText").textContent = "Nicht erreichbar";
-        setStatus(status, error.message || "Konnte Runde nicht öffnen", true);
-      }
     }
 
     document.getElementById("copyLink").addEventListener("click", async () => {
@@ -216,17 +156,10 @@
       location.href = whatsappLink(current.whatsapp, buildWhatsAppText(current));
     });
 
-    window.addEventListener("storage", (event) => {
-      if (event.key === `bestellrunde-round-${id}` && event.newValue) {
-        try {
-          render(JSON.parse(event.newValue));
-        } catch {
-          /* ignore */
-        }
-      }
+    watchRound(id, render, (error) => {
+      document.getElementById("liveText").textContent = "Fehler";
+      setStatus(status, error.message, true);
     });
-
-    startHost();
   </script>
 </body>
 </html>

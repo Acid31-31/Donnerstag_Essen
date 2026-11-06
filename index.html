@@ -21,7 +21,7 @@
 
     <section class="panel">
       <h2>Neue Runde starten</h2>
-      <p class="hint">Kein eigener Server nötig. Du bleibst Gastgeber auf diesem Handy — die Seite einfach offen lassen, während alle bestellen.</p>
+      <p class="hint">Bestellungen liegen in der Cloud. Dein Handy darf aus sein — später siehst du alles sofort.</p>
       <div class="field">
         <label for="title">Name der Runde</label>
         <input id="title" maxlength="80" placeholder="z. B. Büro Mittag" value="Büro Mittag" />
@@ -33,15 +33,15 @@
     </section>
   </main>
   <script type="module">
-    import { emptyRound, saveHostKey, saveRound, hostUrl, newId, setStatus } from "./js/shared.js";
+    import { saveHostKey, hostUrl, newId, setStatus } from "./js/shared.js";
+    import { createRound } from "./js/store.js";
 
     const status = document.getElementById("status");
-    document.getElementById("create").addEventListener("click", () => {
+    document.getElementById("create").addEventListener("click", async () => {
       try {
-        const round = emptyRound(document.getElementById("title").value);
-        const hostKey = newId(16);
-        saveRound(round);
-        saveHostKey(round.id, hostKey);
+        setStatus(status, "Runde wird angelegt…");
+        const round = await createRound(document.getElementById("title").value);
+        saveHostKey(round.id, newId(16));
         location.href = hostUrl(round.id);
       } catch (error) {
         setStatus(status, error.message, true);

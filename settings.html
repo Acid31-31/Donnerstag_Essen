@@ -56,7 +56,8 @@
   </main>
 
   <script type="module">
-    import { loadHostKey, loadRound, saveRound, hostUrl, setStatus } from "./js/shared.js";
+    import { loadHostKey, hostUrl, setStatus } from "./js/shared.js";
+    import { getRound, saveRoundCloud } from "./js/store.js";
 
     const params = new URLSearchParams(location.search);
     const id = params.get("r");
@@ -67,33 +68,29 @@
     document.getElementById("back").href = hostUrl(id);
 
     if (!hostKey) {
-      setStatus(status, "Einstellungen nur auf dem Handy des Gastgebers.", true);
+      setStatus(status, "Einstellungen nur auf dem Handy, mit dem die Runde gestartet wurde.", true);
     }
 
-    const round = loadRound(id);
-    if (!round) {
-      setStatus(status, "Runde nicht gefunden.", true);
-    } else {
+    getRound(id).then((round) => {
       document.getElementById("title").value = round.title || "";
       document.getElementById("address").value = round.address || "";
       document.getElementById("deliveryTime").value = round.deliveryTime || "";
       document.getElementById("whatsapp").value = round.whatsapp || "";
       document.getElementById("greeting").value = round.greeting || "";
       document.getElementById("closing").value = round.closing || "";
-    }
+    }).catch((error) => setStatus(status, error.message, true));
 
-    document.getElementById("saveSettings").addEventListener("click", () => {
+    document.getElementById("saveSettings").addEventListener("click", async () => {
       try {
         if (!hostKey) throw new Error("Keine Berechtigung");
-        const current = loadRound(id);
-        if (!current) throw new Error("Runde nicht gefunden");
+        const current = await getRound(id);
         current.title = document.getElementById("title").value.trim().slice(0, 80) || current.title;
         current.address = document.getElementById("address").value.trim().slice(0, 400);
         current.deliveryTime = document.getElementById("deliveryTime").value.trim().slice(0, 120);
         current.whatsapp = document.getElementById("whatsapp").value.trim().slice(0, 40);
         current.greeting = document.getElementById("greeting").value.trim().slice(0, 1200) || current.greeting;
         current.closing = document.getElementById("closing").value.trim().slice(0, 400) || current.closing;
-        saveRound(current);
+        await saveRoundCloud(current);
         setStatus(status, "Gespeichert.");
       } catch (error) {
         setStatus(status, error.message, true);

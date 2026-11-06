@@ -21,7 +21,7 @@
 
     <section class="panel">
       <h2>Deine Bestellung</h2>
-      <p class="hint" id="meta">Alles landet beim Gastgeber. Der Lieferant beschriftet mit deinem Slogan.</p>
+      <p class="hint" id="meta">Wird in der Cloud gespeichert. Der Gastgeber sieht sie später auch bei ausgeschaltetem Handy.</p>
 
       <div class="field">
         <label for="slogan">Dein Slogan / Name</label>
@@ -43,7 +43,7 @@
 
     <section class="panel" id="done" hidden>
       <h2>Gesendet</h2>
-      <p class="hint">Deine Bestellung ist beim Gastgeber angekommen.</p>
+      <p class="hint">Deine Bestellung ist gespeichert.</p>
       <div class="actions">
         <button class="btn btn-ghost" id="again" type="button">Noch etwas bestellen</button>
       </div>
@@ -51,7 +51,8 @@
   </main>
 
   <script type="module">
-    import { euro, money, setStatus, connectToHost, sendAndWait } from "./js/shared.js";
+    import { euro, money, setStatus } from "./js/shared.js";
+    import { getRound, addOrder } from "./js/store.js";
 
     const params = new URLSearchParams(location.search);
     const id = params.get("r");
@@ -130,40 +131,22 @@
         const items = readItems();
         if (!slogan) throw new Error("Bitte Slogan / Name eintragen");
         if (!items.length) throw new Error("Mindestens ein Gericht eintragen");
-        setStatus(status, "Verbinde mit Gastgeber…");
-        const { peer, conn } = await connectToHost(id);
-        const reply = await sendAndWait(conn, { type: "order", slogan, items }, "ok");
-        if (reply.round?.title) {
-          document.getElementById("heading").textContent = reply.round.title;
-        }
+        setStatus(status, "Wird gespeichert…");
+        await addOrder(id, { slogan, items });
         document.getElementById("done").hidden = false;
-        setStatus(status, "Angekommen beim Gastgeber.");
-        conn.close();
-        peer.destroy();
+        setStatus(status, "Gespeichert.");
       } catch (error) {
-        setStatus(status, error.message || "Senden fehlgeschlagen", true);
+        setStatus(status, error.message, true);
       }
     });
 
-    (async () => {
-      try {
-        setStatus(status, "Lade Runde…");
-        const { peer, conn } = await connectToHost(id);
-        const reply = await sendAndWait(conn, { type: "hello" }, "state");
-        if (reply.round) {
-          document.getElementById("heading").textContent = reply.round.title || "Bestellrunde";
-          const bits = [];
-          if (reply.round.deliveryTime) bits.push(`Lieferzeit: ${reply.round.deliveryTime}`);
-          if (reply.round.address) bits.push(String(reply.round.address).split("\n")[0]);
-          if (bits.length) document.getElementById("meta").textContent = bits.join(" · ");
-        }
-        setStatus(status, "");
-        conn.close();
-        peer.destroy();
-      } catch (error) {
-        setStatus(status, error.message || "Gastgeber nicht erreichbar", true);
-      }
-    })();
+    getRound(id).then((round) => {
+      document.getElementById("heading").textContent = round.title || "Bestellrunde";
+      const bits = [];
+      if (round.deliveryTime) bits.push(`Lieferzeit: ${round.deliveryTime}`);
+      if (round.address) bits.push(String(round.address).split("\n")[0]);
+      if (bits.length) document.getElementById("meta").textContent = bits.join(" · ");
+    }).catch((error) => setStatus(status, error.message, true));
 
     itemsBox.appendChild(itemRow());
     updateSubtotal();
