@@ -57,16 +57,20 @@
 
   <script type="module">
     import { euro, money, setStatus } from "./js/shared.js";
-    import { getRound, addOrder } from "./js/store.js";
+    import { getRound, addOrder, getActiveRoundId } from "./js/store.js";
 
     const params = new URLSearchParams(location.search);
-    const id = params.get("r");
     const status = document.getElementById("status");
     const itemsBox = document.getElementById("items");
+    let id = params.get("r");
 
-    if (!id) {
-      document.body.innerHTML = "<main class='shell'><section class='panel'><p>Link ungültig.</p></section></main>";
-      throw new Error("missing round");
+    async function resolveRoundId() {
+      if (id) return id;
+      const active = await getActiveRoundId();
+      if (!active) throw new Error("Keine offene Bestellrunde");
+      id = active;
+      history.replaceState(null, "", `${location.pathname}?r=${encodeURIComponent(id)}`);
+      return id;
     }
 
     function itemRow() {
@@ -132,6 +136,7 @@
 
     document.getElementById("send").addEventListener("click", async () => {
       try {
+        if (!id) id = await resolveRoundId();
         const slogan = document.getElementById("slogan").value.trim();
         const items = readItems();
         if (!slogan) throw new Error("Bitte Slogan / Name eintragen");
@@ -145,16 +150,23 @@
       }
     });
 
-    getRound(id).then((round) => {
-      document.getElementById("heading").textContent = round.title || "Mittag am Donnerstag";
-      const bits = [];
-      if (round.deliveryTime) bits.push(`Lieferzeit: ${round.deliveryTime}`);
-      if (round.address) bits.push(String(round.address).split("\n")[0]);
-      if (bits.length) document.getElementById("meta").textContent = bits.join(" · ");
-    }).catch((error) => setStatus(status, error.message, true));
-
     itemsBox.appendChild(itemRow());
     updateSubtotal();
+    setStatus(status, "Lade Runde…");
+
+    resolveRoundId()
+      .then((roundId) => getRound(roundId))
+      .then((round) => {
+        document.getElementById("heading").textContent = round.title || "DONNERSTAG_ESSEN";
+        const bits = [];
+        if (round.deliveryTime) bits.push(`Lieferzeit: ${round.deliveryTime}`);
+        if (round.address) bits.push(String(round.address).split("\n")[0]);
+        document.getElementById("meta").textContent = bits.length
+          ? bits.join(" · ")
+          : "Cloud-Sync aktiv · Gastgeber sieht Bestellungen live.";
+        setStatus(status, "");
+      })
+      .catch((error) => setStatus(status, error.message, true));
   </script>
 </body>
 </html>
