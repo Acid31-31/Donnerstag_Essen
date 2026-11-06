@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bestellen · Bestellrunde</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">
+      <div class="brand-mark">BR</div>
+      <div>
+        <h1 id="heading">Bestellrunde</h1>
+        <p>Dein Essen · dein Slogan</p>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>Deine Bestellung</h2>
+      <p class="hint" id="meta">Alles landet beim Gastgeber. Der Lieferant beschriftet mit deinem Slogan.</p>
+
+      <div class="field">
+        <label for="slogan">Dein Slogan / Name</label>
+        <input id="slogan" maxlength="60" placeholder="z. B. Tom – ohne Zwiebeln" />
+      </div>
+
+      <div id="items"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="addItem" type="button">Gericht hinzufügen</button>
+      </div>
+
+      <div class="total-bar"><span>Deine Summe</span><span id="subtotal">0,00 €</span></div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="send" type="button">Senden</button>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+
+    <section class="panel" id="done" hidden>
+      <h2>Gesendet</h2>
+      <p class="hint">Deine Bestellung ist beim Gastgeber angekommen.</p>
+      <div class="actions">
+        <button class="btn btn-ghost" id="again" type="button">Noch etwas bestellen</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { euro, money, setStatus, connectToHost, sendAndWait } from "./js/shared.js";
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get("r");
+    const status = document.getElementById("status");
+    const itemsBox = document.getElementById("items");
+
+    if (!id) {
+      document.body.innerHTML = "<main class='shell'><section class='panel'><p>Link ungültig.</p></section></main>";
+      throw new Error("missing round");
+    }
+
+    function itemRow() {
+      const wrap = document.createElement("div");
+      wrap.className = "row item-row";
+      wrap.innerHTML = `
+        <div class="field span-all">
+          <label>Gericht</label>
+          <input class="name" maxlength="80" placeholder="z. B. Pizza Salami" />
+        </div>
+        <div class="field">
+          <label>Menge</label>
+          <input class="qty" type="number" min="1" max="99" value="1" />
+        </div>
+        <div class="field">
+          <label>Preis €</label>
+          <input class="price" type="number" min="0" step="0.1" placeholder="0,00" />
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="btn btn-danger btn-small remove" type="button">×</button>
+        </div>
+        <div class="field span-all">
+          <label>Bemerkung</label>
+          <input class="note" maxlength="160" placeholder="optional, z. B. ohne Zwiebeln" />
+        </div>
+      `;
+      wrap.querySelector(".remove").addEventListener("click", () => {
+        wrap.remove();
+        updateSubtotal();
+      });
+      wrap.querySelectorAll("input").forEach((input) => input.addEventListener("input", updateSubtotal));
+      return wrap;
+    }
+
+    function readItems() {
+      return [...itemsBox.querySelectorAll(".item-row")].map((row) => ({
+        name: row.querySelector(".name").value.trim(),
+        qty: Number(row.querySelector(".qty").value || 1),
+        price: money(row.querySelector(".price").value || 0),
+        note: row.querySelector(".note").value.trim()
+      })).filter((item) => item.name);
+    }
+
+    function updateSubtotal() {
+      const sum = readItems().reduce((acc, item) => acc + item.qty * item.price, 0);
+      document.getElementById("subtotal").textContent = euro(sum);
+    }
+
+    document.getElementById("addItem").addEventListener("click", () => {
+      itemsBox.appendChild(itemRow());
+      updateSubtotal();
+    });
+
+    document.getElementById("again").addEventListener("click", () => {
+      document.getElementById("done").hidden = true;
+      document.getElementById("slogan").value = "";
+      itemsBox.innerHTML = "";
+      itemsBox.appendChild(itemRow());
+      updateSubtotal();
+      setStatus(status, "");
+    });
+
+    document.getElementById("send").addEventListener("click", async () => {
+      try {
+        const slogan = document.getElementById("slogan").value.trim();
+        const items = readItems();
+        if (!slogan) throw new Error("Bitte Slogan / Name eintragen");
+        if (!items.length) throw new Error("Mindestens ein Gericht eintragen");
+        setStatus(status, "Verbinde mit Gastgeber…");
+        const { peer, conn } = await connectToHost(id);
+        const reply = await sendAndWait(conn, { type: "order", slogan, items }, "ok");
+        if (reply.round?.title) {
+          document.getElementById("heading").textContent = reply.round.title;
+        }
+        document.getElementById("done").hidden = false;
+        setStatus(status, "Angekommen beim Gastgeber.");
+        conn.close();
+        peer.destroy();
+      } catch (error) {
+        setStatus(status, error.message || "Senden fehlgeschlagen", true);
+      }
+    });
+
+    (async () => {
+      try {
+        setStatus(status, "Lade Runde…");
+        const { peer, conn } = await connectToHost(id);
+        const reply = await sendAndWait(conn, { type: "hello" }, "state");
+        if (reply.round) {
+          document.getElementById("heading").textContent = reply.round.title || "Bestellrunde";
+          const bits = [];
+          if (reply.round.deliveryTime) bits.push(`Lieferzeit: ${reply.round.deliveryTime}`);
+          if (reply.round.address) bits.push(String(reply.round.address).split("\n")[0]);
+          if (bits.length) document.getElementById("meta").textContent = bits.join(" · ");
+        }
+        setStatus(status, "");
+        conn.close();
+        peer.destroy();
+      } catch (error) {
+        setStatus(status, error.message || "Gastgeber nicht erreichbar", true);
+      }
+    })();
+
+    itemsBox.appendChild(itemRow());
+    updateSubtotal();
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Einstellungen · Bestellrunde</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">
+      <div class="brand-mark">BR</div>
+      <div>
+        <h1>Einstellungen</h1>
+        <p>Lieferung und WhatsApp-Text</p>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="actions" style="margin-top:0;margin-bottom:16px">
+        <a class="btn btn-ghost" id="back" href="#">Zurück zur Runde</a>
+      </div>
+
+      <div class="field">
+        <label for="title">Name der Runde</label>
+        <input id="title" maxlength="80" />
+      </div>
+      <div class="field">
+        <label for="address">Lieferadresse</label>
+        <textarea id="address" placeholder="Straße Nr.&#10;PLZ Ort&#10;Klingel / Hinweis"></textarea>
+      </div>
+      <div class="field">
+        <label for="deliveryTime">Lieferzeit</label>
+        <input id="deliveryTime" maxlength="120" placeholder="z. B. heute 12:30" />
+      </div>
+      <div class="field">
+        <label for="whatsapp">WhatsApp-Nummer Lieferant</label>
+        <input id="whatsapp" maxlength="40" placeholder="z. B. 0151 12345678" />
+      </div>
+      <div class="field">
+        <label for="greeting">Freundliche Ansprache</label>
+        <textarea id="greeting"></textarea>
+      </div>
+      <div class="field">
+        <label for="closing">Abschluss</label>
+        <textarea id="closing"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="saveSettings" type="button">Speichern</button>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { loadHostKey, loadRound, saveRound, hostUrl, setStatus } from "./js/shared.js";
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get("r");
+    const hostKey = loadHostKey(id || "");
+    const status = document.getElementById("status");
+
+    if (!id) location.href = "./";
+    document.getElementById("back").href = hostUrl(id);
+
+    if (!hostKey) {
+      setStatus(status, "Einstellungen nur auf dem Handy des Gastgebers.", true);
+    }
+
+    const round = loadRound(id);
+    if (!round) {
+      setStatus(status, "Runde nicht gefunden.", true);
+    } else {
+      document.getElementById("title").value = round.title || "";
+      document.getElementById("address").value = round.address || "";
+      document.getElementById("deliveryTime").value = round.deliveryTime || "";
+      document.getElementById("whatsapp").value = round.whatsapp || "";
+      document.getElementById("greeting").value = round.greeting || "";
+      document.getElementById("closing").value = round.closing || "";
+    }
+
+    document.getElementById("saveSettings").addEventListener("click", () => {
+      try {
+        if (!hostKey) throw new Error("Keine Berechtigung");
+        const current = loadRound(id);
+        if (!current) throw new Error("Runde nicht gefunden");
+        current.title = document.getElementById("title").value.trim().slice(0, 80) || current.title;
+        current.address = document.getElementById("address").value.trim().slice(0, 400);
+        current.deliveryTime = document.getElementById("deliveryTime").value.trim().slice(0, 120);
+        current.whatsapp = document.getElementById("whatsapp").value.trim().slice(0, 40);
+        current.greeting = document.getElementById("greeting").value.trim().slice(0, 1200) || current.greeting;
+        current.closing = document.getElementById("closing").value.trim().slice(0, 400) || current.closing;
+        saveRound(current);
+        setStatus(status, "Gespeichert.");
+      } catch (error) {
+        setStatus(status, error.message, true);
+      }
+    });
+  </script>
+</body>
+</html>

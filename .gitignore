@@ -1,0 +1,7 @@
+node_modules/
+data/
+public/
+server.js
+package.json
+Starten.cmd
+.DS_Store

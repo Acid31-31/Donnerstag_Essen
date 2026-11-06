@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bestellrunde</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <main class="shell">
+    <div class="brand">
+      <div class="brand-mark">BR</div>
+      <div>
+        <h1>Bestellrunde</h1>
+        <p>Gemeinsam bestellen. Getrennt beschriften.</p>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>Neue Runde starten</h2>
+      <p class="hint">Kein eigener Server nötig. Du bleibst Gastgeber auf diesem Handy — die Seite einfach offen lassen, während alle bestellen.</p>
+      <div class="field">
+        <label for="title">Name der Runde</label>
+        <input id="title" maxlength="80" placeholder="z. B. Büro Mittag" value="Büro Mittag" />
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="create" type="button">Runde erstellen</button>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+  </main>
+  <script type="module">
+    import { emptyRound, saveHostKey, saveRound, hostUrl, newId, setStatus } from "./js/shared.js";
+
+    const status = document.getElementById("status");
+    document.getElementById("create").addEventListener("click", () => {
+      try {
+        const round = emptyRound(document.getElementById("title").value);
+        const hostKey = newId(16);
+        saveRound(round);
+        saveHostKey(round.id, hostKey);
+        location.href = hostUrl(round.id);
+      } catch (error) {
+        setStatus(status, error.message, true);
+      }
+    });
+  </script>
+</body>
+</html>
