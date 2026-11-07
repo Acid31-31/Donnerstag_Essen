@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=matrix8" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=matrix9" />
   <style>
     .hud-aurora, .hud-hex, .hud-crt, .hud-scan-h, .hud-scan-h2, .hud-scan-v, .knx-stream { display: none !important; }
     #hud-canvas { z-index: 0 !important; }
@@ -19,8 +19,23 @@
     .order-simple .brand p { display: none; }
     .order-simple .live-pill { display: none; }
     .order-simple .panel { padding: 16px; }
-    .order-simple .panel h2 { margin-bottom: 12px; }
+    .order-simple .panel h2 {
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+    }
     .order-simple .hint { display: none; }
+    .order-simple label {
+      font-size: 1.05rem;
+      letter-spacing: 0.06em;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .order-simple input {
+      font-size: 1.05rem;
+      padding: 14px 14px;
+    }
     .order-simple .row {
       grid-template-columns: 1fr 0.45fr 0.55fr auto;
       gap: 8px;
@@ -29,9 +44,9 @@
       border-bottom: 1px solid rgba(57, 215, 232, 0.12);
     }
     .order-simple .row:last-child { border-bottom: 0; }
-    .order-simple .field { margin-bottom: 0; }
+    .order-simple .field { margin-bottom: 12px; }
     .order-simple .field.span-all { margin-top: 4px; }
-    .order-simple .total-bar { margin-top: 10px; }
+    .order-simple .total-bar { margin-top: 10px; font-size: 0.9rem; }
   </style>
 </head>
 <body>
@@ -75,9 +90,9 @@
   </main>
 
   <script type="module">
-    import { euro, money, setStatus } from "./js/shared.js?v=matrix8";
-    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix8";
-    import { mountHudBackground } from "./js/hud-bg.js?v=matrix8";
+    import { euro, money, setStatus } from "./js/shared.js?v=matrix9";
+    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix9";
+    import { mountHudBackground } from "./js/hud-bg.js?v=matrix9";
 
     mountHudBackground();
 
