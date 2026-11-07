@@ -124,8 +124,8 @@ export function mountHudBackground(target = document.body) {
     ctx.fillStyle = "rgba(0,255,154,0.035)";
     for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, w, 1);
 
-    // Alien scans
-    const scanY = ((t * 0.32) % 1) * (h + 120) - 60;
+    // Alien scans – sehr langsam (~22s / ~28s / ~32s pro Durchlauf)
+    const scanY = ((t * 0.045) % 1) * (h + 120) - 60;
     const sg = ctx.createLinearGradient(0, scanY - 40, 0, scanY + 40);
     sg.addColorStop(0, "transparent");
     sg.addColorStop(0.5, "rgba(57,255,200,0.35)");
@@ -133,7 +133,7 @@ export function mountHudBackground(target = document.body) {
     ctx.fillStyle = sg;
     ctx.fillRect(0, scanY - 40, w, 80);
 
-    const scanY2 = ((t * 0.32 + 0.45) % 1) * (h + 80) - 40;
+    const scanY2 = ((t * 0.036 + 0.45) % 1) * (h + 80) - 40;
     const sg2 = ctx.createLinearGradient(0, scanY2 - 16, 0, scanY2 + 16);
     sg2.addColorStop(0, "transparent");
     sg2.addColorStop(0.5, "rgba(57,215,232,0.28)");
@@ -141,7 +141,7 @@ export function mountHudBackground(target = document.body) {
     ctx.fillStyle = sg2;
     ctx.fillRect(0, scanY2 - 16, w, 32);
 
-    const scanX = ((t * 0.22 + 0.2) % 1) * (w + 60) - 30;
+    const scanX = ((t * 0.031 + 0.2) % 1) * (w + 60) - 30;
     const sgx = ctx.createLinearGradient(scanX - 22, 0, scanX + 22, 0);
     sgx.addColorStop(0, "transparent");
     sgx.addColorStop(0.5, "rgba(57,255,200,0.2)");
