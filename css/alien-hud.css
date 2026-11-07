@@ -187,6 +187,21 @@ button, input, textarea { font: inherit; color: inherit; }
   z-index: 2;
 }
 
+.tile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 12px;
+}
+@media (max-width: 720px) {
+  .tile-grid { grid-template-columns: 1fr; }
+}
+.panel.tile {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .brand {
   display: flex;
   align-items: center;

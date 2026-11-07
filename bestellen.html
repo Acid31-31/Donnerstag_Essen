@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <title>Bestellen · Mittag am Donnerstag</title>
+  <title>Bestellen · Donnerstag_Essen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=1" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=matrix2" />
 </head>
 <body>
   <main class="shell">
@@ -24,29 +24,36 @@
       <div class="live-pill">LIVE</div>
     </div>
 
-    <section class="panel">
-      <h2>Deine Bestellung</h2>
-      <p class="hint" id="meta">Cloud-Sync aktiv · Gastgeber sieht Bestellungen live.</p>
+    <div class="tile-grid">
+      <section class="panel tile">
+        <h2>Status</h2>
+        <p class="hint" id="meta">Cloud-Sync aktiv</p>
+        <div class="pill"><span class="dot"></span> LINK ONLINE</div>
+      </section>
 
-      <div class="field">
-        <label for="slogan">Slogan / Name</label>
-        <input id="slogan" maxlength="60" placeholder="z. B. Tom – ohne Zwiebeln" />
-      </div>
+      <section class="panel tile">
+        <h2>Slogan / Name</h2>
+        <div class="field" style="margin:0">
+          <input id="slogan" maxlength="60" placeholder="z. B. Tom – ohne Zwiebeln" />
+        </div>
+      </section>
+    </div>
 
+    <section class="panel" style="margin-top:14px">
+      <h2>Positionen</h2>
+      <p class="hint">Jede Zeile = ein Gericht · Alien-Tile Sync</p>
       <div id="items"></div>
       <div class="actions">
         <button class="btn btn-ghost" id="addItem" type="button">Gericht hinzufügen</button>
       </div>
-
       <div class="total-bar"><span>Summe</span><span id="subtotal">0,00 €</span></div>
-
       <div class="actions">
         <button class="btn btn-primary" id="send" type="button">Senden</button>
       </div>
       <div class="status" id="status"></div>
     </section>
 
-    <section class="panel" id="done" hidden>
+    <section class="panel" id="done" hidden style="margin-top:14px">
       <h2>Gesendet</h2>
       <p class="hint">Signal gespeichert · Bestellung in der Cloud.</p>
       <div class="actions">
@@ -58,6 +65,9 @@
   <script type="module">
     import { euro, money, setStatus } from "./js/shared.js";
     import { getRound, addOrder, getActiveRoundId } from "./js/store.js";
+    import { mountHudBackground } from "./js/hud-bg.js?v=matrix2";
+
+    mountHudBackground();
 
     const params = new URLSearchParams(location.search);
     const status = document.getElementById("status");
@@ -95,7 +105,7 @@
         </div>
         <div class="field span-all">
           <label>Bemerkung</label>
-          <input class="note" maxlength="160" placeholder="optional, z. B. ohne Zwiebeln" />
+          <input class="note" maxlength="160" placeholder="optional" />
         </div>
       `;
       wrap.querySelector(".remove").addEventListener("click", () => {
@@ -157,13 +167,11 @@
     resolveRoundId()
       .then((roundId) => getRound(roundId))
       .then((round) => {
-        document.getElementById("heading").textContent = round.title || "DONNERSTAG_ESSEN";
+        document.getElementById("heading").textContent = (round.title || "DONNERSTAG_ESSEN").toUpperCase();
         const bits = [];
         if (round.deliveryTime) bits.push(`Lieferzeit: ${round.deliveryTime}`);
         if (round.address) bits.push(String(round.address).split("\n")[0]);
-        document.getElementById("meta").textContent = bits.length
-          ? bits.join(" · ")
-          : "Cloud-Sync aktiv · Gastgeber sieht Bestellungen live.";
+        document.getElementById("meta").textContent = bits.length ? bits.join(" · ") : "Cloud-Sync aktiv";
         setStatus(status, "");
       })
       .catch((error) => setStatus(status, error.message, true));

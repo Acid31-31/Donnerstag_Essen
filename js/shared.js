@@ -223,48 +223,19 @@ export function sendAndWait(conn, message, expectType, timeoutMs = 10000) {
   });
 }
 
-/** HUD / Alien-Hintergrund wie Android-App (Aurora + Scans + Hex + Daten). */
-export function installKnxChrome() {
-  if (document.querySelector(".hud-aurora")) return;
-
-  const aurora = document.createElement("div");
-  aurora.className = "hud-aurora";
-  aurora.innerHTML = '<i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i>';
-  document.body.prepend(aurora);
-
-  const hex = document.createElement("div");
-  hex.className = "hud-hex";
-  document.body.prepend(hex);
-
-  const crt = document.createElement("div");
-  crt.className = "hud-crt";
-  document.body.prepend(crt);
-
-  for (const cls of ["hud-scan-h", "hud-scan-h2", "hud-scan-v"]) {
-    const scan = document.createElement("div");
-    scan.className = cls;
-    document.body.prepend(scan);
-  }
-
-  const tags = ["SENS", "TEMP", "KNX", "BUS", "GRP", "ACT", "PWM", "DEV", "LINK", "SYNC", "DATA", "NODE", "ROOM", "HVAC", "STAT"];
-  const lines = Array.from({ length: 48 }, () => {
-    const tag = tags[Math.floor(Math.random() * tags.length)];
-    const hx = Math.floor(Math.random() * 0xffffff).toString(16).toUpperCase().padStart(6, "0");
-    return `${tag} ${hx}`;
-  }).join("\n");
-  const block = `${lines}\n${lines}`;
-  for (const side of ["left", "right"]) {
-    const el = document.createElement("div");
-    el.className = `knx-stream ${side}`;
-    el.innerHTML = `<span class="track">${block}\n${block}</span>`;
-    document.body.prepend(el);
-  }
+/** HUD-Hintergrund (Canvas) – Hex, Matrix, Alien-Scans wie App. */
+export async function installKnxChrome() {
+  const { mountHudBackground } = await import("./hud-bg.js");
+  mountHudBackground();
 }
 
 if (typeof document !== "undefined") {
+  const boot = () => {
+    installKnxChrome().catch(() => {});
+  };
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => installKnxChrome());
+    document.addEventListener("DOMContentLoaded", boot);
   } else {
-    installKnxChrome();
+    boot();
   }
 }
