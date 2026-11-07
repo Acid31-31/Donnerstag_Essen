@@ -1,8 +1,9 @@
-/** Canvas-Hintergrund 1:1 App: Hex + Matrix-Daten + Alien-Scans */
+/** Canvas-Hintergrund: Hex + Programmcode-Matrix (mit Alienzeichen) + langsame Scans */
+import { MATRIX_CODE } from "./matrix-code.js";
+
 export function mountHudBackground(target = document.body) {
   if (document.getElementById("hud-canvas")) return;
 
-  // Alte DOM-Overlays (verdecken sonst die Matrix)
   target.querySelectorAll(
     ".hud-aurora,.hud-hex,.hud-crt,.hud-scan-h,.hud-scan-h2,.hud-scan-v,.knx-stream"
   ).forEach((el) => el.remove());
@@ -20,12 +21,25 @@ export function mountHudBackground(target = document.body) {
   target.prepend(canvas);
 
   const ctx = canvas.getContext("2d");
-  const tags = ["SENS", "TEMP", "KNX", "BUS", "GRP", "ACT", "PWM", "DEV", "LINK", "SYNC", "DATA", "NODE", "ROOM", "HVAC", "STAT", "ORD", "PAY"];
+  const code = MATRIX_CODE.length ? MATRIX_CODE : ["DONNERSTAG_ESSEN"];
   let w = 0;
   let h = 0;
   let t = 0;
+  let cursor = 0;
   const cols = [];
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const LINE_H = 15;
+  const COL_W = 92;
+  const VISIBLE = 28;
+
+  function nextChunk() {
+    const chunk = [];
+    for (let i = 0; i < VISIBLE; i++) {
+      chunk.push(code[cursor % code.length]);
+      cursor = (cursor + 1) % code.length;
+    }
+    return chunk;
+  }
 
   function resize() {
     w = window.innerWidth;
@@ -34,22 +48,16 @@ export function mountHudBackground(target = document.body) {
     canvas.height = Math.floor(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     cols.length = 0;
-    const colW = 78;
-    const count = Math.ceil(w / colW) + 2;
+    const count = Math.ceil(w / COL_W) + 2;
     for (let i = 0; i < count; i++) {
       cols.push({
-        x: i * colW + 8,
+        x: i * COL_W + 6,
         y: Math.random() * h,
-        speed: 28 + Math.random() * 55,
-        lines: Array.from({ length: 18 }, () => line())
+        // deutlich langsamer als zuvor
+        speed: 6 + Math.random() * 10,
+        lines: nextChunk()
       });
     }
-  }
-
-  function line() {
-    const tag = tags[(Math.random() * tags.length) | 0];
-    const hex = ((Math.random() * 0xffffff) | 0).toString(16).toUpperCase().padStart(6, "0");
-    return `${tag} ${hex}`;
   }
 
   function drawHexGrid() {
@@ -81,7 +89,6 @@ export function mountHudBackground(target = document.body) {
     ctx.fillStyle = "#071018";
     ctx.fillRect(0, 0, w, h);
 
-    // Aurora blobs
     const blobs = [
       [0.2, 0.18, 0.45, "rgba(57,215,232,0.28)"],
       [0.85, 0.12, 0.4, "rgba(123,97,255,0.22)"],
@@ -103,28 +110,30 @@ export function mountHudBackground(target = document.body) {
 
     drawHexGrid();
 
-    // Matrix / Daten-Spalten
-    ctx.font = "12px 'Share Tech Mono', Consolas, monospace";
+    ctx.font = "11px 'Share Tech Mono', Consolas, monospace";
     for (const col of cols) {
       col.y += col.speed * 0.016;
-      if (col.y > h + 220) {
-        col.y = -220;
-        col.lines = Array.from({ length: 18 }, () => line());
+      if (col.y > h + col.lines.length * LINE_H) {
+        col.y = -col.lines.length * LINE_H;
+        col.lines = nextChunk();
       }
       col.lines.forEach((txt, i) => {
-        const yy = col.y - i * 18;
+        const yy = col.y - i * LINE_H;
         if (yy < -20 || yy > h + 20) return;
-        const edge = col.x < 120 || col.x > w - 140;
-        ctx.fillStyle = edge ? "rgba(57,215,232,0.55)" : "rgba(57,215,232,0.16)";
+        const edge = col.x < 130 || col.x > w - 150;
+        const head = i === 0;
+        ctx.fillStyle = head
+          ? "rgba(180,255,240,0.85)"
+          : edge
+            ? "rgba(57,215,232,0.5)"
+            : "rgba(57,215,232,0.18)";
         ctx.fillText(txt, col.x, yy);
       });
     }
 
-    // CRT lines
     ctx.fillStyle = "rgba(0,255,154,0.035)";
     for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, w, 1);
 
-    // Alien scans – sehr langsam (~22s / ~28s / ~32s pro Durchlauf)
     const scanY = ((t * 0.045) % 1) * (h + 120) - 60;
     const sg = ctx.createLinearGradient(0, scanY - 40, 0, scanY + 40);
     sg.addColorStop(0, "transparent");
