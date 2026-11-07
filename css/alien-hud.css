@@ -3,16 +3,16 @@
   --bg: #071018;
   --panel: rgba(10, 24, 52, 0.78);
   --panel2: rgba(12, 30, 60, 0.78);
-  --line: rgba(59, 158, 255, 0.33);
-  --line-strong: rgba(59, 158, 255, 0.72);
+  --line: rgba(45, 110, 255, 0.55);
+  --line-strong: rgba(50, 120, 255, 0.95);
   --text: #e8f7ff;
   --muted: #7fa8b8;
-  --accent: #3b9eff;
-  --accent-2: #2a6fbf;
-  --ok: #3b9eff;
+  --accent: #3a78ff;
+  --accent-2: #1e56d8;
+  --ok: #3a78ff;
   --warn: #ffb454;
   --danger: #ff6b8a;
-  --glow: 0 0 24px rgba(59, 158, 255, 0.35);
+  --glow: 0 0 22px rgba(45, 110, 255, 0.45);
   --radius: 16px;
   --font-display: "Michroma", "Segoe UI", sans-serif;
   --font-body: "Share Tech Mono", "Consolas", monospace;
@@ -225,8 +225,8 @@ button, input, textarea { font: inherit; color: inherit; }
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: rgba(59, 158, 255, 0.12);
-  border: 1.5px solid var(--line-strong);
+  background: rgba(45, 110, 255, 0.12);
+  border: 2px solid #3a78ff;
   box-shadow: var(--glow);
   font-family: var(--font-display);
   font-size: 11px;
@@ -252,8 +252,8 @@ button, input, textarea { font: inherit; color: inherit; }
 }
 
 .live-pill {
-  border: 1.5px solid var(--line-strong);
-  background: rgba(59, 158, 255, 0.16);
+  border: 2px solid #3a78ff;
+  background: rgba(45, 110, 255, 0.16);
   color: var(--accent);
   border-radius: 12px;
   padding: 8px 12px;
@@ -267,15 +267,15 @@ button, input, textarea { font: inherit; color: inherit; }
 
 .panel {
   background: var(--panel);
-  border: 1.5px solid var(--line-strong);
+  border: 2px solid #3a78ff;
   border-radius: var(--radius);
   padding: 18px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow:
-    0 0 0 1px rgba(59, 158, 255, 0.08),
-    0 18px 50px rgba(0, 0, 0, 0.45),
-    var(--glow);
+    0 0 0 1px rgba(45, 110, 255, 0.25),
+    0 0 18px rgba(45, 110, 255, 0.35),
+    0 18px 50px rgba(0, 0, 0, 0.45);
   animation: rise 0.55s ease both;
 }
 
@@ -359,8 +359,8 @@ textarea { min-height: 110px; resize: vertical; }
 
 .btn {
   appearance: none;
-  border: 1.5px solid var(--line-strong);
-  background: rgba(59, 158, 255, 0.16);
+  border: 2px solid #3a78ff;
+  background: rgba(45, 110, 255, 0.16);
   color: var(--text);
   border-radius: 12px;
   padding: 12px 18px;
@@ -409,7 +409,7 @@ textarea { min-height: 110px; resize: vertical; }
 }
 
 .stat {
-  border: 1px solid var(--line);
+  border: 2px solid #3a78ff;
   border-radius: 12px;
   padding: 14px;
   background: var(--panel2);
@@ -426,7 +426,7 @@ textarea { min-height: 110px; resize: vertical; }
 }
 
 .order-card {
-  border: 1px solid var(--line);
+  border: 2px solid #3a78ff;
   border-radius: 12px;
   padding: 14px;
   margin-bottom: 10px;
@@ -471,8 +471,8 @@ textarea { min-height: 110px; resize: vertical; }
   margin-top: 14px;
   padding: 14px 16px;
   border-radius: 12px;
-  border: 1.5px solid var(--line-strong);
-  background: rgba(59, 158, 255, 0.18);
+  border: 2px solid #3a78ff;
+  background: rgba(45, 110, 255, 0.18);
   display: flex;
   justify-content: space-between;
   align-items: center;
