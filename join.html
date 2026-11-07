@@ -9,59 +9,65 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=matrix7" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=matrix8" />
   <style>
-    /* Sicherheit: alte Overlay-Divs nie über Canvas legen */
     .hud-aurora, .hud-hex, .hud-crt, .hud-scan-h, .hud-scan-h2, .hud-scan-v, .knx-stream { display: none !important; }
     #hud-canvas { z-index: 0 !important; }
-    .shell { z-index: 2 !important; position: relative; }
+    .shell { z-index: 2 !important; position: relative; max-width: 520px; }
+    .order-simple .brand { margin-bottom: 14px; }
+    .order-simple .brand h1 { font-size: clamp(0.75rem, 2.2vw, 0.95rem); }
+    .order-simple .brand p { display: none; }
+    .order-simple .live-pill { display: none; }
+    .order-simple .panel { padding: 16px; }
+    .order-simple .panel h2 { margin-bottom: 12px; }
+    .order-simple .hint { display: none; }
+    .order-simple .row {
+      grid-template-columns: 1fr 0.45fr 0.55fr auto;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(57, 215, 232, 0.12);
+    }
+    .order-simple .row:last-child { border-bottom: 0; }
+    .order-simple .field { margin-bottom: 0; }
+    .order-simple .field.span-all { margin-top: 4px; }
+    .order-simple .total-bar { margin-top: 10px; }
   </style>
 </head>
 <body>
-  <main class="shell">
+  <main class="shell order-simple">
     <div class="brand">
       <div>
         <div class="brand-mark">DE</div>
         <div>
           <h1 id="heading">DONNERSTAG_ESSEN</h1>
-          <p>// UNIT ORDER · YOUR TAG</p>
+          <p></p>
         </div>
       </div>
       <div class="live-pill">LIVE</div>
     </div>
 
-    <div class="tile-grid">
-      <section class="panel tile">
-        <h2>Status</h2>
-        <p class="hint" id="meta">Cloud-Sync aktiv</p>
-        <div class="pill"><span class="dot"></span> LINK ONLINE</div>
-      </section>
+    <section class="panel">
+      <div class="field">
+        <label for="slogan">Dein Name</label>
+        <input id="slogan" maxlength="60" placeholder="z. B. Tom" autocomplete="name" />
+      </div>
 
-      <section class="panel tile">
-        <h2>Slogan / Name</h2>
-        <div class="field" style="margin:0">
-          <input id="slogan" maxlength="60" placeholder="z. B. Tom – ohne Zwiebeln" />
-        </div>
-      </section>
-    </div>
-
-    <section class="panel" style="margin-top:14px">
-      <h2>Positionen</h2>
-      <p class="hint">Jede Zeile = ein Gericht · Alien-Tile Sync</p>
+      <h2>Deine Bestellung</h2>
       <div id="items"></div>
       <div class="actions">
-        <button class="btn btn-ghost" id="addItem" type="button">Gericht hinzufügen</button>
+        <button class="btn btn-ghost" id="addItem" type="button">+ Gericht</button>
       </div>
       <div class="total-bar"><span>Summe</span><span id="subtotal">0,00 €</span></div>
       <div class="actions">
-        <button class="btn btn-primary" id="send" type="button">Senden</button>
+        <button class="btn btn-primary" id="send" type="button">Bestellung senden</button>
       </div>
       <div class="status" id="status"></div>
     </section>
 
     <section class="panel" id="done" hidden style="margin-top:14px">
       <h2>Gesendet</h2>
-      <p class="hint">Signal gespeichert · Bestellung in der Cloud.</p>
+      <p class="hint" style="display:block">Deine Bestellung ist gespeichert.</p>
       <div class="actions">
         <button class="btn btn-ghost" id="again" type="button">Noch etwas bestellen</button>
       </div>
@@ -69,9 +75,9 @@
   </main>
 
   <script type="module">
-    import { euro, money, setStatus } from "./js/shared.js?v=matrix7";
-    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix7";
-    import { mountHudBackground } from "./js/hud-bg.js?v=matrix7";
+    import { euro, money, setStatus } from "./js/shared.js?v=matrix8";
+    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix8";
+    import { mountHudBackground } from "./js/hud-bg.js?v=matrix8";
 
     mountHudBackground();
 
@@ -115,7 +121,14 @@
         </div>
       `;
       wrap.querySelector(".remove").addEventListener("click", () => {
-        wrap.remove();
+        if (itemsBox.querySelectorAll(".item-row").length <= 1) {
+          wrap.querySelector(".name").value = "";
+          wrap.querySelector(".qty").value = "1";
+          wrap.querySelector(".price").value = "";
+          wrap.querySelector(".note").value = "";
+        } else {
+          wrap.remove();
+        }
         updateSubtotal();
       });
       wrap.querySelectorAll("input").forEach((input) => input.addEventListener("input", updateSubtotal));
@@ -155,7 +168,7 @@
         if (!id) id = await resolveRoundId();
         const slogan = document.getElementById("slogan").value.trim();
         const items = readItems();
-        if (!slogan) throw new Error("Bitte Slogan / Name eintragen");
+        if (!slogan) throw new Error("Bitte deinen Namen eintragen");
         if (!items.length) throw new Error("Mindestens ein Gericht eintragen");
         setStatus(status, "Wird gespeichert…");
         await addOrder(id, { slogan, items });
@@ -168,16 +181,11 @@
 
     itemsBox.appendChild(itemRow());
     updateSubtotal();
-    setStatus(status, "Lade Runde…");
 
     resolveRoundId()
       .then((roundId) => getRound(roundId))
       .then((round) => {
         document.getElementById("heading").textContent = (round.title || "DONNERSTAG_ESSEN").toUpperCase();
-        const bits = [];
-        if (round.deliveryTime) bits.push(`Lieferzeit: ${round.deliveryTime}`);
-        if (round.address) bits.push(String(round.address).split("\n")[0]);
-        document.getElementById("meta").textContent = bits.length ? bits.join(" · ") : "Cloud-Sync aktiv";
         setStatus(status, "");
       })
       .catch((error) => setStatus(status, error.message, true));
