@@ -225,17 +225,6 @@ export function sendAndWait(conn, message, expectType, timeoutMs = 10000) {
 
 /** HUD-Hintergrund (Canvas) – Hex, Matrix, Alien-Scans wie App. */
 export async function installKnxChrome() {
-  const { mountHudBackground } = await import("./hud-bg.js");
+  const { mountHudBackground } = await import(`./hud-bg.js?v=matrix3`);
   mountHudBackground();
-}
-
-if (typeof document !== "undefined") {
-  const boot = () => {
-    installKnxChrome().catch(() => {});
-  };
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
 }

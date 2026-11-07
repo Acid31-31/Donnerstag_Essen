@@ -2,6 +2,11 @@
 export function mountHudBackground(target = document.body) {
   if (document.getElementById("hud-canvas")) return;
 
+  // Alte DOM-Overlays (verdecken sonst die Matrix)
+  target.querySelectorAll(
+    ".hud-aurora,.hud-hex,.hud-crt,.hud-scan-h,.hud-scan-h2,.hud-scan-v,.knx-stream"
+  ).forEach((el) => el.remove());
+
   const canvas = document.createElement("canvas");
   canvas.id = "hud-canvas";
   Object.assign(canvas.style, {
