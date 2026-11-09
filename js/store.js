@@ -39,19 +39,64 @@ export async function getActiveRoundId() {
   return data && data.id ? String(data.id) : "";
 }
 
+export async function archiveActiveRound() {
+  const activeId = await getActiveRoundId();
+  if (!activeId) return null;
+  const round = await getRound(activeId);
+  const closedAt = new Date().toISOString();
+  const dateLabel = new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Europe/Berlin"
+  }).format(new Date(round.createdAt || closedAt));
+  const orders = {};
+  for (const order of round.orders || []) {
+    const key = order.id || newId(8);
+    orders[key] = { ...order, id: key };
+  }
+  const payload = {
+    ...round,
+    orders,
+    closedAt,
+    dateLabel,
+    orderCount: (round.orders || []).length,
+    total: round.total || 0
+  };
+  await dbFetch(`/rounds/_closed/${encodeURIComponent(round.id)}.json`, {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+  return payload;
+}
+
 export async function createRound(title) {
+  // Alte Woche mit Datum + Bestellungen sichern, dann leere neue Woche
+  await archiveActiveRound().catch(() => null);
   const round = emptyRound(title);
   await dbFetch(`/rounds/${round.id}.json`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(round)
   });
   await setActiveRound(round.id);
-  return withTotals(round);
+  return withTotals({ ...round, orders: [] });
 }
 
 function asOrderList(value) {
-  if (Array.isArray(value)) return value.filter(Boolean);
-  if (value && typeof value === "object") return Object.values(value).filter(Boolean);
+  if (Array.isArray(value)) {
+    return value.filter(Boolean).map((order, index) => ({
+      ...order,
+      id: order?.id || String(index)
+    }));
+  }
+  if (value && typeof value === "object") {
+    return Object.entries(value)
+      .filter(([, order]) => order)
+      .map(([key, order]) => ({
+        ...order,
+        id: order.id || key
+      }));
+  }
   return [];
 }
 
@@ -63,62 +108,79 @@ export async function getRound(id) {
 }
 
 export async function saveRoundCloud(round) {
+  // Nur Metadaten patchen – orders/replies niemals überschreiben
   const clean = {
     id: round.id,
     title: round.title,
     address: round.address || "",
     deliveryTime: round.deliveryTime || "",
     whatsapp: round.whatsapp || "",
+    supplierName: round.supplierName || "",
     greeting: round.greeting || "",
     closing: round.closing || "",
-    createdAt: round.createdAt || new Date().toISOString(),
-    orders: Array.isArray(round.orders) ? round.orders : []
+    createdAt: round.createdAt || new Date().toISOString()
   };
   await dbFetch(`/rounds/${encodeURIComponent(round.id)}.json`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(clean)
   });
-  return withTotals(clean);
+  return getRound(round.id);
 }
 
 export async function addOrder(roundId, { slogan, items }) {
-  // Optimistic concurrency: read-modify-write with short retry
-  let lastError = null;
-  for (let attempt = 0; attempt < 5; attempt++) {
-    try {
-      const round = await getRound(roundId);
-      const cleanItems = (items || [])
-        .map((item) => ({
-          name: String(item.name || "").trim().slice(0, 80),
-          qty: Math.max(1, Math.min(99, Number(item.qty) || 1)),
-          price: Math.max(0, Number(item.price) || 0),
-          note: String(item.note || "").trim().slice(0, 160)
-        }))
-        .filter((item) => item.name);
+  const cleanItems = (items || [])
+    .map((item) => ({
+      name: String(item.name || "").trim().slice(0, 80),
+      qty: Math.max(1, Math.min(99, Number(item.qty) || 1)),
+      price: Math.max(0, Number(item.price) || 0),
+      note: String(item.note || "").trim().slice(0, 160)
+    }))
+    .filter((item) => item.name);
 
-      if (!String(slogan || "").trim()) throw new Error("Slogan fehlt");
-      if (!cleanItems.length) throw new Error("Mindestens ein Gericht nötig");
+  if (!String(slogan || "").trim()) throw new Error("Slogan fehlt");
+  if (!cleanItems.length) throw new Error("Mindestens ein Gericht nötig");
 
-      round.orders = round.orders || [];
-      round.orders.push({
-        id: newId(8),
-        slogan: String(slogan).trim().slice(0, 60),
-        items: cleanItems,
-        createdAt: new Date().toISOString()
-      });
-      return await saveRoundCloud(round);
-    } catch (error) {
-      lastError = error;
-      await new Promise((resolve) => setTimeout(resolve, 200 * (attempt + 1)));
-    }
+  const order = {
+    slogan: String(slogan).trim().slice(0, 60),
+    items: cleanItems,
+    createdAt: new Date().toISOString()
+  };
+  // Atomarer Anhang – parallele Bestellungen überschreiben sich nicht mehr
+  const created = await dbFetch(`/rounds/${encodeURIComponent(roundId)}/orders.json`, {
+    method: "POST",
+    body: JSON.stringify(order)
+  });
+  const key = created && created.name ? String(created.name) : "";
+  if (key) {
+    await dbFetch(`/rounds/${encodeURIComponent(roundId)}/orders/${encodeURIComponent(key)}.json`, {
+      method: "PATCH",
+      body: JSON.stringify({ id: key })
+    });
   }
-  throw lastError || new Error("Bestellung konnte nicht gespeichert werden");
+  return getRound(roundId);
 }
 
 export async function removeOrder(roundId, orderId) {
+  const id = String(orderId || "");
+  if (!id) throw new Error("Bestellung fehlt");
+  await dbFetch(`/rounds/${encodeURIComponent(roundId)}/orders/${encodeURIComponent(id)}.json`, {
+    method: "DELETE"
+  });
+  // Altbestand als Array: falls noch vorhanden, Rest als Map neu schreiben
   const round = await getRound(roundId);
-  round.orders = (round.orders || []).filter((order) => order.id !== orderId);
-  return saveRoundCloud(round);
+  if ((round.orders || []).some((order) => order.id === id)) {
+    const remaining = {};
+    for (const order of round.orders) {
+      if (order.id === id) continue;
+      remaining[order.id] = order;
+    }
+    await dbFetch(`/rounds/${encodeURIComponent(roundId)}/orders.json`, {
+      method: "PUT",
+      body: JSON.stringify(remaining)
+    });
+    return getRound(roundId);
+  }
+  return round;
 }
 
 export function watchRound(id, onData, onError) {

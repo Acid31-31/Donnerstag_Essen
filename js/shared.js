@@ -26,10 +26,10 @@ export function emptyRound(title = "Mittag am Donnerstag") {
     address: "",
     deliveryTime: "",
     whatsapp: "",
+    supplierName: "",
     greeting: DEFAULT_GREETING,
     closing: DEFAULT_CLOSING,
-    createdAt: new Date().toISOString(),
-    orders: []
+    createdAt: new Date().toISOString()
   };
 }
 
