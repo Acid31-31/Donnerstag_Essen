@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=matrix10" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=matrix13" />
   <style>
     .hud-aurora, .hud-hex, .hud-crt, .hud-scan-h, .hud-scan-h2, .hud-scan-v, .knx-stream { display: none !important; }
     #hud-canvas { z-index: 0 !important; }
@@ -82,7 +82,7 @@
 
     <section class="panel" id="done" hidden style="margin-top:14px">
       <h2>Gesendet</h2>
-      <p class="hint" style="display:block">Deine Bestellung ist gespeichert.</p>
+      <p class="hint" style="display:block">Gesendet. Die Bestellung erscheint nur in der App beim Gastgeber – hier gibt es keine Liste.</p>
       <div class="actions">
         <button class="btn btn-ghost" id="again" type="button">Noch etwas bestellen</button>
       </div>
@@ -90,9 +90,9 @@
   </main>
 
   <script type="module">
-    import { euro, money, setStatus } from "./js/shared.js?v=matrix12";
-    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix12";
-    import { mountHudBackground } from "./js/hud-bg.js?v=matrix12";
+    import { euro, money, setStatus } from "./js/shared.js?v=matrix13";
+    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix13";
+    import { mountHudBackground } from "./js/hud-bg.js?v=matrix13";
 
     mountHudBackground();
 

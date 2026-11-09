@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
-  <title>Gastgeber · Mittag am Donnerstag</title>
+  <title>Gastgeber · Donnerstag_Essen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=1" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=matrix12" />
 </head>
 <body>
   <main class="shell">
@@ -18,154 +18,74 @@
         <div class="brand-mark">DE</div>
         <div>
           <h1 id="heading">DONNERSTAG_ESSEN</h1>
-          <p>Gastgeber-Ansicht · Cloud</p>
+          <p>Nur Link teilen · Bestellungen in der App</p>
         </div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <div class="live-pill">LIVE</div>
-        <a class="btn btn-ghost btn-small" id="openSettings" href="#">Einstellungen</a>
       </div>
     </div>
 
     <section class="panel">
-      <div class="stats">
-        <div class="stat"><span>Bestellungen</span><strong id="count">0</strong></div>
-        <div class="stat"><span>Personen</span><strong id="people">0</strong></div>
-        <div class="stat"><span>Gesamtsumme</span><strong id="total">0,00 €</strong></div>
-      </div>
-      <div class="pill"><span class="dot"></span> <span id="liveText">Lade…</span></div>
-      <div id="orders" class="empty">Noch keine Bestellungen. Link in die Gruppe schicken.</div>
-      <div class="total-bar"><span>Gesamt</span><span id="totalBar">0,00 €</span></div>
-      <div class="actions">
-        <button class="btn btn-primary" id="sendWhatsApp" type="button">An Lieferant senden</button>
-        <button class="btn btn-ghost" id="copyText" type="button">Text kopieren</button>
-      </div>
+      <h2>Bestellungen</h2>
+      <p class="hint" style="display:block">
+        Auf der Webseite werden keine Bestellungen mehr angezeigt.
+        Eingegangene Bestellungen siehst du nur in der <strong>Donnerstag_Essen</strong>-App
+        unter „Neue Bestellungen“.
+      </p>
       <div class="status" id="status"></div>
     </section>
 
     <section class="panel">
       <h2>Link für die Gruppe</h2>
       <div class="share-box">
-        <input id="shareLink" readonly value="Donnerstag_Essen" />
+        <input id="shareLink" readonly value="" />
         <button class="btn btn-ghost" id="copyLink" type="button">Kopieren</button>
-        <button class="btn btn-ghost" id="shareNative" type="button">Teilen</button>
+      </div>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn btn-primary" id="shareWhatsApp" type="button">Link an WhatsApp senden</button>
       </div>
     </section>
   </main>
-
   <script type="module">
-    import {
-      loadHostKey, euro, settingsUrl, groupShareUrl, GROUP_LINK_NAME,
-      buildWhatsAppText, whatsappLink, setStatus
-    } from "./js/shared.js";
-    import { watchRound, removeOrder, setActiveRound } from "./js/store.js";
+    import { joinUrl, setStatus } from "./js/shared.js?v=matrix12";
+    import { getRound, getActiveRoundId, setActiveRound } from "./js/store.js?v=matrix12";
 
     const params = new URLSearchParams(location.search);
-    const id = params.get("r");
-    const hostKey = loadHostKey(id || "");
     const status = document.getElementById("status");
-    let current = null;
+    let id = params.get("r") || "";
 
-    if (!id) location.href = "./";
-    document.getElementById("openSettings").href = settingsUrl(id);
-
-    if (!hostKey) {
-      setStatus(status, "Einstellungen und Löschen nur auf dem Handy, mit dem die Runde gestartet wurde.", false);
+    async function resolveId() {
+      if (id) return id;
+      id = await getActiveRoundId();
+      if (!id) throw new Error("Keine offene Runde");
+      return id;
     }
 
-    function render(round) {
-      current = round;
-      document.getElementById("liveText").textContent = "Cloud verbunden";
-      document.getElementById("heading").textContent = round.title || GROUP_LINK_NAME;
-      document.getElementById("shareLink").value = GROUP_LINK_NAME;
-      document.getElementById("count").textContent = String((round.orders || []).length);
-      document.getElementById("people").textContent = String(new Set((round.orders || []).map((o) => o.slogan)).size);
-      document.getElementById("total").textContent = euro(round.total);
-      document.getElementById("totalBar").textContent = euro(round.total);
-
-      const box = document.getElementById("orders");
-      if (!(round.orders || []).length) {
-        box.className = "empty";
-        box.textContent = "Noch keine Bestellungen. Link in die Gruppe schicken.";
-        return;
-      }
-
-      box.className = "";
-      box.innerHTML = round.orders.map((order) => `
-        <article class="order-card">
-          <header>
-            <h3>${escapeHtml(order.slogan)}</h3>
-            <strong>${euro(order.subtotal)}</strong>
-          </header>
-          <ul>
-            ${order.items.map((item) => `
-              <li>
-                <div>
-                  <div>${item.qty}× ${escapeHtml(item.name)}</div>
-                  ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ""}
-                </div>
-                <span>${euro((item.qty || 1) * (item.price || 0))}</span>
-              </li>
-            `).join("")}
-          </ul>
-          ${hostKey ? `<div class="actions"><button class="btn btn-danger btn-small" data-delete="${order.id}" type="button">Entfernen</button></div>` : ""}
-        </article>
-      `).join("");
-
-      box.querySelectorAll("[data-delete]").forEach((button) => {
-        button.addEventListener("click", async () => {
-          try {
-            await removeOrder(id, button.getAttribute("data-delete"));
-            setStatus(status, "Bestellung entfernt.");
-          } catch (error) {
-            setStatus(status, error.message, true);
-          }
-        });
-      });
-    }
-
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
-    }
+    resolveId()
+      .then(async (roundId) => {
+        await setActiveRound(roundId).catch(() => null);
+        const round = await getRound(roundId);
+        document.getElementById("heading").textContent =
+          (round.title || "DONNERSTAG_ESSEN").toUpperCase();
+        const link = joinUrl(roundId);
+        document.getElementById("shareLink").value = link;
+        setStatus(status, "Runde aktiv. Bestellungen nur in der App sichtbar.");
+      })
+      .catch((error) => setStatus(status, error.message, true));
 
     document.getElementById("copyLink").addEventListener("click", async () => {
-      await navigator.clipboard.writeText(groupShareUrl());
-      setStatus(status, "Donnerstag_Essen kopiert.");
-    });
-
-    document.getElementById("shareNative").addEventListener("click", async () => {
-      const link = groupShareUrl();
-      if (navigator.share) {
-        await navigator.share({ url: link });
-      } else {
+      const link = document.getElementById("shareLink").value;
+      try {
         await navigator.clipboard.writeText(link);
-        setStatus(status, "Donnerstag_Essen kopiert.");
+        setStatus(status, "Link kopiert.");
+      } catch {
+        document.getElementById("shareLink").select();
+        setStatus(status, "Link markiert – bitte kopieren.", true);
       }
     });
 
-    document.getElementById("copyText").addEventListener("click", async () => {
-      if (!current) return;
-      await navigator.clipboard.writeText(buildWhatsAppText(current));
-      setStatus(status, "Bestelltext kopiert.");
-    });
-
-    document.getElementById("sendWhatsApp").addEventListener("click", () => {
-      if (!current) return;
-      if (!(current.orders || []).length) {
-        setStatus(status, "Noch keine Bestellungen vorhanden.", true);
-        return;
-      }
-      location.href = whatsappLink(current.whatsapp, buildWhatsAppText(current));
-    });
-
-    setActiveRound(id).catch(() => {});
-    watchRound(id, render, (error) => {
-      document.getElementById("liveText").textContent = "Fehler";
-      setStatus(status, error.message, true);
+    document.getElementById("shareWhatsApp").addEventListener("click", () => {
+      const link = document.getElementById("shareLink").value;
+      if (!link) return;
+      location.href = `https://wa.me/?text=${encodeURIComponent(link)}`;
     });
   </script>
 </body>
