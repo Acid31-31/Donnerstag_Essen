@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=matrix13" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=matrix14" />
   <style>
     .hud-aurora, .hud-hex, .hud-crt, .hud-scan-h, .hud-scan-h2, .hud-scan-v, .knx-stream { display: none !important; }
     #hud-canvas { z-index: 0 !important; }
@@ -90,9 +90,9 @@
   </main>
 
   <script type="module">
-    import { euro, money, setStatus } from "./js/shared.js?v=matrix13";
-    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix13";
-    import { mountHudBackground } from "./js/hud-bg.js?v=matrix13";
+    import { euro, money, setStatus } from "./js/shared.js?v=matrix14";
+    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix14";
+    import { mountHudBackground } from "./js/hud-bg.js?v=matrix14";
 
     mountHudBackground();
 
@@ -102,9 +102,12 @@
     let id = params.get("r");
 
     async function resolveRoundId() {
-      if (id) return id;
+      // Immer die aktive Runde – alte WhatsApp-Links mit ?r=… sonst schreiben woanders hin
       const active = await getActiveRoundId();
       if (!active) throw new Error("Keine offene Bestellrunde");
+      if (id && id !== active) {
+        console.warn("Veralteter Rundelink ignoriert:", id, "→ aktiv:", active);
+      }
       id = active;
       history.replaceState(null, "", `${location.pathname}?r=${encodeURIComponent(id)}`);
       return id;

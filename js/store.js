@@ -128,6 +128,11 @@ export async function saveRoundCloud(round) {
 }
 
 export async function addOrder(roundId, { slogan, items }) {
+  // Immer in die aktuell offene Runde schreiben – alte ?r=-Links bleiben gültig
+  const active = await getActiveRoundId();
+  const targetId = active || String(roundId || "");
+  if (!targetId) throw new Error("Keine offene Bestellrunde");
+
   const cleanItems = (items || [])
     .map((item) => ({
       name: String(item.name || "").trim().slice(0, 80),
@@ -146,18 +151,18 @@ export async function addOrder(roundId, { slogan, items }) {
     createdAt: new Date().toISOString()
   };
   // Atomarer Anhang – parallele Bestellungen überschreiben sich nicht mehr
-  const created = await dbFetch(`/rounds/${encodeURIComponent(roundId)}/orders.json`, {
+  const created = await dbFetch(`/rounds/${encodeURIComponent(targetId)}/orders.json`, {
     method: "POST",
     body: JSON.stringify(order)
   });
   const key = created && created.name ? String(created.name) : "";
   if (key) {
-    await dbFetch(`/rounds/${encodeURIComponent(roundId)}/orders/${encodeURIComponent(key)}.json`, {
+    await dbFetch(`/rounds/${encodeURIComponent(targetId)}/orders/${encodeURIComponent(key)}.json`, {
       method: "PATCH",
       body: JSON.stringify({ id: key })
     });
   }
-  return getRound(roundId);
+  return getRound(targetId);
 }
 
 export async function removeOrder(roundId, orderId) {

@@ -56,20 +56,20 @@
     </div>
   </main>
   <script type="module">
-    import { joinUrl, startUrl, setStatus } from "./js/shared.js";
-    import { getActiveRoundId } from "./js/store.js";
+    import { startUrl, setStatus, siteBase } from "./js/shared.js?v=matrix14";
+    import { getActiveRoundId } from "./js/store.js?v=matrix14";
 
     const status = document.getElementById("status");
     const cta = document.getElementById("cta");
+    // Feste Bestell-URL – die Seite selbst holt immer die aktuelle Runde
+    const orderPage = `${siteBase()}bestellen.html`;
 
     getActiveRoundId()
       .then((id) => {
         if (id) {
-          const target = joinUrl(id);
-          cta.href = target;
+          cta.href = orderPage;
           status.textContent = "Tippen zum Bestellen";
-          // Direkt zur Bestellung, wenn schon eine Runde offen ist
-          location.replace(target);
+          location.replace(orderPage);
           return;
         }
         cta.href = startUrl();
