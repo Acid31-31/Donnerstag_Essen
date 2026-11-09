@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Bestellen · Donnerstag_Essen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=matrix14" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=v15" />
   <style>
     .hud-aurora, .hud-hex, .hud-crt, .hud-scan-h, .hud-scan-h2, .hud-scan-v, .knx-stream { display: none !important; }
     #hud-canvas { z-index: 0 !important; }
@@ -47,7 +48,28 @@
     .order-simple .field { margin-bottom: 12px; }
     .order-simple .field.span-all { margin-top: 4px; }
     .order-simple .total-bar { margin-top: 10px; font-size: 0.9rem; }
+    .status.error { color: #ff6b6b; font-weight: 600; }
   </style>
+  <!-- Sofort aktive Runde erzwingen – auch bei altem ?r=jnxh7dl1 Link -->
+  <script>
+    (function () {
+      var DB = "https://bestellrunde-default-rtdb.firebaseio.com";
+      var params = new URLSearchParams(location.search);
+      var current = params.get("r") || "";
+      fetch(DB + "/rounds/_active.json", { cache: "no-store" })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var active = data && data.id ? String(data.id) : "";
+          if (!active) return;
+          if (current !== active || params.get("v") !== "15") {
+            location.replace(
+              location.pathname + "?r=" + encodeURIComponent(active) + "&v=15"
+            );
+          }
+        })
+        .catch(function () {});
+    })();
+  </script>
 </head>
 <body>
   <main class="shell order-simple">
@@ -65,7 +87,7 @@
     <section class="panel">
       <div class="field">
         <label for="slogan">Dein Name</label>
-        <input id="slogan" maxlength="60" placeholder="z. B. Tom" autocomplete="name" />
+        <input id="slogan" name="besteller_name" maxlength="60" placeholder="z. B. Tom" autocomplete="off" autocapitalize="words" />
       </div>
 
       <h2>Deine Bestellung</h2>
@@ -90,26 +112,24 @@
   </main>
 
   <script type="module">
-    import { euro, money, setStatus } from "./js/shared.js?v=matrix14";
-    import { getRound, addOrder, getActiveRoundId } from "./js/store.js?v=matrix14";
-    import { mountHudBackground } from "./js/hud-bg.js?v=matrix14";
+    import { euro, money, setStatus } from "./js/shared.v15.js";
+    import { getRound, addOrder, getActiveRoundId } from "./js/store.v15.js";
+    import { mountHudBackground } from "./js/hud-bg.v15.js";
 
     mountHudBackground();
 
-    const params = new URLSearchParams(location.search);
     const status = document.getElementById("status");
     const itemsBox = document.getElementById("items");
-    let id = params.get("r");
+    let id = "";
 
     async function resolveRoundId() {
-      // Immer die aktive Runde – alte WhatsApp-Links mit ?r=… sonst schreiben woanders hin
       const active = await getActiveRoundId();
       if (!active) throw new Error("Keine offene Bestellrunde");
-      if (id && id !== active) {
-        console.warn("Veralteter Rundelink ignoriert:", id, "→ aktiv:", active);
-      }
       id = active;
-      history.replaceState(null, "", `${location.pathname}?r=${encodeURIComponent(id)}`);
+      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=15`;
+      if (location.pathname + location.search !== next) {
+        history.replaceState(null, "", next);
+      }
       return id;
     }
 
@@ -119,15 +139,15 @@
       wrap.innerHTML = `
         <div class="field span-all">
           <label>Gericht</label>
-          <input class="name" maxlength="80" placeholder="z. B. Pizza Salami" />
+          <input class="dish" name="dish_name" maxlength="80" placeholder="z. B. Pizza Salami" autocomplete="off" />
         </div>
         <div class="field">
           <label>Menge</label>
-          <input class="qty" type="number" min="1" max="99" value="1" />
+          <input class="qty" name="dish_qty" type="number" min="1" max="99" value="1" autocomplete="off" />
         </div>
         <div class="field">
           <label>Preis €</label>
-          <input class="price" type="number" min="0" step="0.1" placeholder="0,00" />
+          <input class="price" name="dish_price" type="number" min="0" step="0.1" placeholder="0,00" autocomplete="off" />
         </div>
         <div class="field">
           <label>&nbsp;</label>
@@ -135,12 +155,12 @@
         </div>
         <div class="field span-all">
           <label>Bemerkung</label>
-          <input class="note" maxlength="160" placeholder="optional" />
+          <input class="note" name="dish_note" maxlength="160" placeholder="optional" autocomplete="off" />
         </div>
       `;
       wrap.querySelector(".remove").addEventListener("click", () => {
         if (itemsBox.querySelectorAll(".item-row").length <= 1) {
-          wrap.querySelector(".name").value = "";
+          wrap.querySelector(".dish").value = "";
           wrap.querySelector(".qty").value = "1";
           wrap.querySelector(".price").value = "";
           wrap.querySelector(".note").value = "";
@@ -155,7 +175,7 @@
 
     function readItems() {
       return [...itemsBox.querySelectorAll(".item-row")].map((row) => ({
-        name: row.querySelector(".name").value.trim(),
+        name: row.querySelector(".dish").value.trim(),
         qty: Number(row.querySelector(".qty").value || 1),
         price: money(row.querySelector(".price").value || 0),
         note: row.querySelector(".note").value.trim()
@@ -183,7 +203,8 @@
 
     document.getElementById("send").addEventListener("click", async () => {
       try {
-        if (!id) id = await resolveRoundId();
+        // Immer frisch die aktive Runde holen – nie dem alten ?r= vertrauen
+        id = await resolveRoundId();
         const slogan = document.getElementById("slogan").value.trim();
         const items = readItems();
         if (!slogan) throw new Error("Bitte deinen Namen eintragen");
@@ -191,9 +212,9 @@
         setStatus(status, "Wird gespeichert…");
         await addOrder(id, { slogan, items });
         document.getElementById("done").hidden = false;
-        setStatus(status, "Gespeichert.");
+        setStatus(status, "Gespeichert in der aktuellen Runde.");
       } catch (error) {
-        setStatus(status, error.message, true);
+        setStatus(status, error.message || "Senden fehlgeschlagen", true);
       }
     });
 
