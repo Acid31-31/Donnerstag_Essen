@@ -215,9 +215,9 @@
         .then(function (data) {
           var active = data && data.id ? String(data.id) : "";
           if (!active) return;
-          if (current !== active || params.get("v") !== "18") {
+          if (current !== active || params.get("v") !== "19") {
             location.replace(
-              location.pathname + "?r=" + encodeURIComponent(active) + "&v=18"
+              location.pathname + "?r=" + encodeURIComponent(active) + "&v=19"
             );
           }
         })
@@ -295,7 +295,7 @@
       const active = await getActiveRoundId();
       if (!active) throw new Error("Keine offene Bestellrunde");
       id = active;
-      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=18`;
+      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=19`;
       if (location.pathname + location.search !== next) {
         history.replaceState(null, "", next);
       }
@@ -322,12 +322,21 @@
       "Joghurtsauce",
       "Ohne Sauce"
     ];
+    const MEATS = ["Gemischt", "Hähnchen", "Kalb"];
 
-    function isDonerDish(name) {
-      const n = String(name || "").toLowerCase();
-      if (!n) return false;
-      if (n.includes("pizza") || n.includes("pide") || n.includes("salat") || n.includes("nugget")) return false;
-      return /döner|drehspieß|doner|kebab/.test(n) || /\brolle\b/.test(n);
+    function donerText(row) {
+      const dish = row.querySelector(".dish")?.value || "";
+      const beilagen = row.querySelector(".beilagen")?.value || "";
+      return `${dish} ${beilagen}`.toLowerCase();
+    }
+
+    function isDonerDish(rowOrName) {
+      const n = (typeof rowOrName === "string"
+        ? rowOrName
+        : donerText(rowOrName)
+      ).toLowerCase();
+      if (!n.trim()) return false;
+      return /döner|doner|drehspieß|drehspiess|kebab|kebap|giro|dönerfleisch|haehnchendreh|hähnchendreh|hähnchendöner|adana/.test(n);
     }
 
     function sauceOptions(selected) {
@@ -343,18 +352,27 @@
       }).join("");
     }
 
+    function buildMeats(selected = "Gemischt") {
+      return MEATS.map((meat) => {
+        const on = meat === selected ? " on" : "";
+        return `<button type="button" class="chip meat-chip${on}" data-meat="${meat}">${meat}</button>`;
+      }).join("");
+    }
+
     function composeNote(row) {
       const parts = [];
       const beilagen = row.querySelector(".beilagen").value.trim();
       if (beilagen) parts.push(`Beilagen: ${beilagen}`);
-      const extras = [...row.querySelectorAll(".chip.on")].map((el) => el.dataset.extra);
+      const extras = [...row.querySelectorAll(".extras .chip.on")].map((el) => el.dataset.extra);
       if (extras.length) parts.push(`Zusatz: ${extras.join(", ")}`);
-      if (isDonerDish(row.querySelector(".dish").value) && row.querySelector(".doner-box").classList.contains("show")) {
+      if (isDonerDish(row) && row.querySelector(".doner-box").classList.contains("show")) {
+        const meat = row.querySelector(".meat-chip.on")?.dataset.meat || "Gemischt";
+        parts.push(`Fleisch: ${meat}`);
         const top = row.querySelector(".sauce-top").value;
         const bottom = row.querySelector(".sauce-bottom").value;
         if (top) parts.push(`Sauce oben: ${top}`);
         if (bottom) parts.push(`Sauce unten: ${bottom}`);
-        if (top && bottom && top !== bottom) {
+        if (top && bottom && top !== "Ohne Sauce" && bottom !== "Ohne Sauce") {
           parts.push("Döner voll mit Sauce (oben + unten)");
         }
       }
@@ -363,7 +381,7 @@
 
     function syncDonerBox(row) {
       const box = row.querySelector(".doner-box");
-      if (isDonerDish(row.querySelector(".dish").value)) box.classList.add("show");
+      if (isDonerDish(row)) box.classList.add("show");
       else box.classList.remove("show");
     }
 
@@ -396,8 +414,10 @@
           <div class="chip-row extras">${buildExtras()}</div>
         </div>
         <div class="field span-all doner-box">
-          <p class="sub">Nur Döner: Sauce oben und unten – damit der Döner voll mit Sauce ist.</p>
-          <div class="sauce-grid">
+          <p class="sub">Döner-Gericht: Fleisch wählen, Sauce oben und unten – damit alles voll mit Sauce ist.</p>
+          <label>Fleisch</label>
+          <div class="chip-row meats">${buildMeats("Gemischt")}</div>
+          <div class="sauce-grid" style="margin-top:10px">
             <div>
               <label>Sauce oben</label>
               <select class="sauce-top">${sauceOptions("Knoblauchsauce")}</select>
@@ -415,7 +435,10 @@
           wrap.querySelector(".qty").value = "1";
           wrap.querySelector(".price").value = "";
           wrap.querySelector(".beilagen").value = "";
-          wrap.querySelectorAll(".chip.on").forEach((el) => el.classList.remove("on"));
+          wrap.querySelectorAll(".extras .chip.on").forEach((el) => el.classList.remove("on"));
+          wrap.querySelectorAll(".meat-chip").forEach((el) => {
+            el.classList.toggle("on", el.dataset.meat === "Gemischt");
+          });
           syncDonerBox(wrap);
         } else {
           wrap.remove();
@@ -423,8 +446,15 @@
         updateSubtotal();
       });
       wrap.querySelector(".dish").addEventListener("input", () => syncDonerBox(wrap));
-      wrap.querySelectorAll(".chip").forEach((chip) => {
+      wrap.querySelector(".beilagen").addEventListener("input", () => syncDonerBox(wrap));
+      wrap.querySelectorAll(".extras .chip").forEach((chip) => {
         chip.addEventListener("click", () => chip.classList.toggle("on"));
+      });
+      wrap.querySelectorAll(".meat-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          wrap.querySelectorAll(".meat-chip").forEach((el) => el.classList.remove("on"));
+          chip.classList.add("on");
+        });
       });
       wrap.querySelectorAll("input, select").forEach((input) => {
         input.addEventListener("input", updateSubtotal);
@@ -536,7 +566,7 @@
 
     async function loadMenu() {
       try {
-        const res = await fetch("./js/menu-rathaus.json?v=18", { cache: "no-store" });
+        const res = await fetch("./js/menu-rathaus.json?v=19", { cache: "no-store" });
         if (!res.ok) throw new Error("Menü nicht ladbar");
         menuData = await res.json();
         document.getElementById("menuNote").textContent =
