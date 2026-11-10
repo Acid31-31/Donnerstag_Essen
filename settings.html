@@ -34,12 +34,18 @@
         <input id="title" maxlength="80" />
       </div>
       <div class="field">
-        <label for="address">Lieferadresse</label>
-        <textarea id="address" placeholder="Straße Nr.&#10;PLZ Ort&#10;Klingel / Hinweis"></textarea>
+        <label for="deliveryType">Lieferart</label>
+        <input id="deliveryType" maxlength="80" value="Lieferung" />
       </div>
       <div class="field">
         <label for="deliveryTime">Lieferzeit</label>
-        <input id="deliveryTime" maxlength="120" placeholder="z. B. heute 12:30" />
+        <input id="deliveryTime" maxlength="120" value="SPÄTESTENS um 12:30 Uhr" />
+      </div>
+      <div class="field">
+        <label for="address">Lieferadresse</label>
+        <textarea id="address">Firma HERKO Metalltechnik
+Ludwig-Erhard-Straße 5
+56637 Plaidt Tour 3.</textarea>
       </div>
       <div class="field">
         <label for="whatsapp">WhatsApp-Nummer Lieferant</label>
@@ -78,8 +84,10 @@
 
     getRound(id).then((round) => {
       document.getElementById("title").value = round.title || "";
-      document.getElementById("address").value = round.address || "";
-      document.getElementById("deliveryTime").value = round.deliveryTime || "";
+      document.getElementById("deliveryType").value = round.deliveryType || "Lieferung";
+      document.getElementById("deliveryTime").value = round.deliveryTime || "SPÄTESTENS um 12:30 Uhr";
+      document.getElementById("address").value = round.address ||
+        "Firma HERKO Metalltechnik\nLudwig-Erhard-Straße 5\n56637 Plaidt Tour 3.";
       document.getElementById("whatsapp").value = round.whatsapp || "";
       document.getElementById("greeting").value = round.greeting || "";
       document.getElementById("closing").value = round.closing || "";
@@ -90,8 +98,11 @@
         if (!hostKey) throw new Error("Keine Berechtigung");
         const current = await getRound(id);
         current.title = document.getElementById("title").value.trim().slice(0, 80) || current.title;
-        current.address = document.getElementById("address").value.trim().slice(0, 400);
-        current.deliveryTime = document.getElementById("deliveryTime").value.trim().slice(0, 120);
+        current.deliveryType = document.getElementById("deliveryType").value.trim().slice(0, 80) || "Lieferung";
+        current.deliveryTime = document.getElementById("deliveryTime").value.trim().slice(0, 120) ||
+          "SPÄTESTENS um 12:30 Uhr";
+        current.address = document.getElementById("address").value.trim().slice(0, 400) ||
+          "Firma HERKO Metalltechnik\nLudwig-Erhard-Straße 5\n56637 Plaidt Tour 3.";
         current.whatsapp = document.getElementById("whatsapp").value.trim().slice(0, 40);
         current.greeting = document.getElementById("greeting").value.trim().slice(0, 1200) || current.greeting;
         current.closing = document.getElementById("closing").value.trim().slice(0, 400) || current.closing;

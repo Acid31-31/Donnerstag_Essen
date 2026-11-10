@@ -87,13 +87,18 @@ export function buildWhatsAppText(round) {
   const lines = [];
   lines.push((view.greeting || "").trim());
   lines.push("");
-  if (view.address) {
-    lines.push("Lieferadresse:");
-    lines.push(view.address.trim());
-    lines.push("");
+  if (view.deliveryType) {
+    lines.push(`Lieferart: ${view.deliveryType.trim()}`);
   }
   if (view.deliveryTime) {
-    lines.push(`Gewünschte Lieferzeit: ${view.deliveryTime.trim()}`);
+    lines.push(`Lieferzeit: ${view.deliveryTime.trim()}`);
+  }
+  if (view.address) {
+    lines.push("");
+    lines.push("Lieferadresse:");
+    lines.push(view.address.trim());
+  }
+  if (view.deliveryType || view.deliveryTime || view.address) {
     lines.push("");
   }
   lines.push("Bitte jede Position mit dem jeweiligen Namen/Slogan beschriften,");

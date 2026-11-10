@@ -114,6 +114,7 @@ export async function saveRoundCloud(round) {
     title: round.title,
     address: round.address || "",
     deliveryTime: round.deliveryTime || "",
+    deliveryType: round.deliveryType || "Lieferung",
     whatsapp: round.whatsapp || "",
     supplierName: round.supplierName || "",
     greeting: round.greeting || "",
