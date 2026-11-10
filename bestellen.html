@@ -10,18 +10,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=v15" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=v16" />
   <style>
     .hud-aurora, .hud-hex, .hud-crt, .hud-scan-h, .hud-scan-h2, .hud-scan-v, .knx-stream { display: none !important; }
     #hud-canvas { z-index: 0 !important; }
-    .shell { z-index: 2 !important; position: relative; max-width: 520px; }
+    .shell { z-index: 2 !important; position: relative; max-width: 560px; }
     .order-simple .brand { margin-bottom: 14px; }
     .order-simple .brand h1 { font-size: clamp(0.75rem, 2.2vw, 0.95rem); }
     .order-simple .brand p { display: none; }
     .order-simple .live-pill { display: none; }
     .order-simple .panel { padding: 16px; }
     .order-simple .panel h2 {
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       font-size: 0.95rem;
       letter-spacing: 0.12em;
     }
@@ -49,8 +49,110 @@
     .order-simple .field.span-all { margin-top: 4px; }
     .order-simple .total-bar { margin-top: 10px; font-size: 0.9rem; }
     .status.error { color: #ff6b6b; font-weight: 600; }
+
+    .menu-note {
+      display: block !important;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.35;
+    }
+    .menu-search {
+      width: 100%;
+      margin-bottom: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.28);
+      color: var(--text);
+      padding: 12px 14px;
+      font: inherit;
+    }
+    .menu-cats {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .menu-cat {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      background: rgba(57, 215, 232, 0.08);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+    .menu-cat.active {
+      background: rgba(57, 215, 232, 0.22);
+      border-color: var(--line-strong);
+      color: var(--accent);
+    }
+    .menu-list {
+      max-height: min(52vh, 420px);
+      overflow: auto;
+      border: 1px solid rgba(57, 215, 232, 0.14);
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .menu-item {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 12px;
+      text-align: left;
+      border: 0;
+      border-bottom: 1px solid rgba(57, 215, 232, 0.1);
+      background: transparent;
+      color: inherit;
+      padding: 12px 12px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .menu-item:last-child { border-bottom: 0; }
+    .menu-item:active { background: rgba(57, 215, 232, 0.12); }
+    .menu-item .title {
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    .menu-item .desc {
+      grid-column: 1 / -1;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .menu-item .price {
+      font-family: var(--font-display);
+      color: var(--accent);
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    .menu-empty {
+      padding: 18px 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .toast-add {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: rgba(11, 24, 36, 0.95);
+      border: 1px solid var(--line-strong);
+      color: var(--accent);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .toast-add.show { opacity: 1; }
   </style>
-  <!-- Sofort aktive Runde erzwingen – auch bei altem ?r=jnxh7dl1 Link -->
   <script>
     (function () {
       var DB = "https://bestellrunde-default-rtdb.firebaseio.com";
@@ -61,9 +163,9 @@
         .then(function (data) {
           var active = data && data.id ? String(data.id) : "";
           if (!active) return;
-          if (current !== active || params.get("v") !== "15") {
+          if (current !== active || params.get("v") !== "16") {
             location.replace(
-              location.pathname + "?r=" + encodeURIComponent(active) + "&v=15"
+              location.pathname + "?r=" + encodeURIComponent(active) + "&v=16"
             );
           }
         })
@@ -90,10 +192,18 @@
         <input id="slogan" name="besteller_name" maxlength="60" placeholder="z. B. Tom" autocomplete="off" autocapitalize="words" />
       </div>
 
+      <h2>Menükarte</h2>
+      <p class="menu-note" id="menuNote">Rathaus Grill Kruft – Gericht antippen, dann senden.</p>
+      <input class="menu-search" id="menuSearch" type="search" placeholder="Suchen… z. B. Pizza, Döner, Schnitzel" autocomplete="off" />
+      <div class="menu-cats" id="menuCats"></div>
+      <div class="menu-list" id="menuList"><div class="menu-empty">Menü wird geladen…</div></div>
+    </section>
+
+    <section class="panel" style="margin-top:14px">
       <h2>Deine Bestellung</h2>
       <div id="items"></div>
       <div class="actions">
-        <button class="btn btn-ghost" id="addItem" type="button">+ Gericht</button>
+        <button class="btn btn-ghost" id="addItem" type="button">+ Freitext</button>
       </div>
       <div class="total-bar"><span>Summe</span><span id="subtotal">0,00 €</span></div>
       <div class="actions">
@@ -110,6 +220,7 @@
       </div>
     </section>
   </main>
+  <div class="toast-add" id="toastAdd">Hinzugefügt</div>
 
   <script type="module">
     import { euro, money, setStatus } from "./js/shared.v15.js";
@@ -120,20 +231,26 @@
 
     const status = document.getElementById("status");
     const itemsBox = document.getElementById("items");
+    const menuCats = document.getElementById("menuCats");
+    const menuList = document.getElementById("menuList");
+    const menuSearch = document.getElementById("menuSearch");
+    const toastAdd = document.getElementById("toastAdd");
     let id = "";
+    let menuData = null;
+    let activeCat = "all";
 
     async function resolveRoundId() {
       const active = await getActiveRoundId();
       if (!active) throw new Error("Keine offene Bestellrunde");
       id = active;
-      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=15`;
+      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=16`;
       if (location.pathname + location.search !== next) {
         history.replaceState(null, "", next);
       }
       return id;
     }
 
-    function itemRow() {
+    function itemRow(preset = null) {
       const wrap = document.createElement("div");
       wrap.className = "row item-row";
       wrap.innerHTML = `
@@ -170,6 +287,12 @@
         updateSubtotal();
       });
       wrap.querySelectorAll("input").forEach((input) => input.addEventListener("input", updateSubtotal));
+      if (preset) {
+        wrap.querySelector(".dish").value = preset.name || "";
+        wrap.querySelector(".price").value = preset.price != null ? String(preset.price) : "";
+        wrap.querySelector(".note").value = preset.note || "";
+        wrap.querySelector(".qty").value = String(preset.qty || 1);
+      }
       return wrap;
     }
 
@@ -187,6 +310,100 @@
       document.getElementById("subtotal").textContent = euro(sum);
     }
 
+    function showToast(text) {
+      toastAdd.textContent = text;
+      toastAdd.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toastAdd.classList.remove("show"), 1400);
+    }
+
+    function addFromMenu(item) {
+      const label = item.nr ? `${item.nr}. ${item.name}` : item.name;
+      const emptyRows = [...itemsBox.querySelectorAll(".item-row")].filter((row) => {
+        return !row.querySelector(".dish").value.trim();
+      });
+      const row = emptyRows[0] || itemRow();
+      if (!emptyRows[0]) itemsBox.appendChild(row);
+      row.querySelector(".dish").value = label;
+      row.querySelector(".price").value = String(item.price ?? "");
+      if (item.desc) row.querySelector(".note").value = item.desc;
+      row.querySelector(".qty").value = "1";
+      updateSubtotal();
+      showToast(`+ ${label}`);
+      document.getElementById("send").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function allItems() {
+      if (!menuData) return [];
+      return menuData.categories.flatMap((cat) =>
+        (cat.items || []).map((item) => ({ ...item, category: cat.title, catId: cat.id }))
+      );
+    }
+
+    function renderCats() {
+      if (!menuData) return;
+      menuCats.innerHTML = "";
+      const cats = [{ id: "all", title: "Alle" }, ...menuData.categories];
+      for (const cat of cats) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "menu-cat" + (activeCat === cat.id ? " active" : "");
+        btn.textContent = cat.title;
+        btn.addEventListener("click", () => {
+          activeCat = cat.id;
+          renderCats();
+          renderMenu();
+        });
+        menuCats.appendChild(btn);
+      }
+    }
+
+    function renderMenu() {
+      if (!menuData) return;
+      const q = menuSearch.value.trim().toLowerCase();
+      let items = allItems();
+      if (activeCat !== "all") items = items.filter((item) => item.catId === activeCat);
+      if (q) {
+        items = items.filter((item) => {
+          const hay = `${item.nr || ""} ${item.name} ${item.desc || ""} ${item.category}`.toLowerCase();
+          return hay.includes(q);
+        });
+      }
+      if (!items.length) {
+        menuList.innerHTML = `<div class="menu-empty">Kein Treffer.</div>`;
+        return;
+      }
+      menuList.innerHTML = "";
+      for (const item of items) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "menu-item";
+        btn.innerHTML = `
+          <span class="title">${item.nr ? item.nr + ". " : ""}${item.name}</span>
+          <span class="price">${euro(item.price)}</span>
+          ${item.desc ? `<span class="desc">${item.desc}</span>` : ""}
+        `;
+        btn.addEventListener("click", () => addFromMenu(item));
+        menuList.appendChild(btn);
+      }
+    }
+
+    async function loadMenu() {
+      try {
+        const res = await fetch("./js/menu-rathaus.json?v=16", { cache: "no-store" });
+        if (!res.ok) throw new Error("Menü nicht ladbar");
+        menuData = await res.json();
+        document.getElementById("menuNote").textContent =
+          `${menuData.restaurant} · ${menuData.note || "Gericht antippen zum Bestellen."}`;
+        renderCats();
+        renderMenu();
+      } catch (error) {
+        menuList.innerHTML = `<div class="menu-empty">${error.message || "Menü fehlt"}</div>`;
+      }
+    }
+
+    menuSearch.addEventListener("input", renderMenu);
+
     document.getElementById("addItem").addEventListener("click", () => {
       itemsBox.appendChild(itemRow());
       updateSubtotal();
@@ -203,7 +420,6 @@
 
     document.getElementById("send").addEventListener("click", async () => {
       try {
-        // Immer frisch die aktive Runde holen – nie dem alten ?r= vertrauen
         id = await resolveRoundId();
         const slogan = document.getElementById("slogan").value.trim();
         const items = readItems();
@@ -220,6 +436,7 @@
 
     itemsBox.appendChild(itemRow());
     updateSubtotal();
+    loadMenu();
 
     resolveRoundId()
       .then((roundId) => getRound(roundId))

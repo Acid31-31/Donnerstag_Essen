@@ -1,0 +1,302 @@
+{
+  "restaurant": "Rathaus Grill Kruft",
+  "address": "Taurengasse 4, 56642 Kruft",
+  "phone": "02652 9377854",
+  "note": "Tippe ein Gericht an – es wird in deine Bestellung übernommen.",
+  "categories": [
+    {
+      "id": "tuerkisch",
+      "title": "Türkische Leckerbissen",
+      "items": [
+        { "nr": "01", "name": "Drehspieß", "desc": "mit Drehspießfleisch, Salat, Sauce", "price": 8.0 },
+        { "nr": "02", "name": "Drehspieß XXL", "desc": "mehr Fleisch, Salat, Sauce", "price": 9.0 },
+        { "nr": "03", "name": "Drehspieß Rolle", "desc": "Drehspießfleisch, Salat, Sauce", "price": 9.0 },
+        { "nr": "04", "name": "Drehspieß Teller", "desc": "mit Salat, Pommes, Sauce", "price": 12.0 },
+        { "nr": "04b", "name": "Drehspieß Teller mit Reis", "desc": "NEU · Salat, Sauce", "price": 12.5 },
+        { "nr": "05", "name": "Drehspieß Teller XXL", "desc": "doppelt Fleisch, Salat, Pommes, Sauce", "price": 13.5 },
+        { "nr": "05A", "name": "Döner Menü", "desc": "Pommes + Getränk", "price": 11.0 },
+        { "nr": "06", "name": "Pomm Döner", "desc": "Pommes mit Drehspießfleisch, Sauce", "price": 8.5 },
+        { "nr": "07", "name": "Türkische Pizza", "desc": "mit Drehspießfleisch, Salat, Sauce", "price": 9.0 },
+        { "nr": "08", "name": "Chicken Nugget Teller", "desc": "Pommes, Mayo oder Ketchup", "price": 9.0 },
+        { "nr": "09", "name": "Teigtasche vegetarisch", "desc": "mit Salat, Sauce", "price": 6.5 },
+        { "nr": "10", "name": "Drehspieß al Forno", "desc": "überbacken · Pommes, Salat, Käse", "price": 9.5 },
+        { "nr": "11", "name": "Drehspieß al Forno XXL", "desc": "überbacken · Pommes, Salat, Käse", "price": 14.0 },
+        { "nr": "12", "name": "Chilli-Cheese Döner", "desc": "Drehspießfleisch, Salat, Käsesauce", "price": 9.0 },
+        { "nr": "12a", "name": "Chilli-Cheese Rolle", "desc": "Pommes, Salat, Jalapeños, Käsesauce", "price": 10.0 },
+        { "nr": "12b", "name": "Chilli-Cheese Pommes", "desc": "mit Jalapeños", "price": 5.0 },
+        { "nr": "12c", "name": "Chilli-Cheese Pommes Döner", "desc": "Drehspießfleisch, Pommes, Salat, Jalapeños, Käsesauce", "price": 10.0 }
+      ]
+    },
+    {
+      "id": "falafel",
+      "title": "Falafelgerichte",
+      "items": [
+        { "nr": "13A", "name": "Falafelsandwich", "desc": "Falafel, Salat & Knoblauchauce", "price": 8.0 },
+        { "nr": "13B", "name": "Falafelteller", "desc": "Falafel, Salat & Knoblauchauce", "price": 9.0 },
+        { "nr": "13C", "name": "Falafelteller XXL", "desc": "Falafel, Salat, Pommes & Knoblauchauce", "price": 10.0 }
+      ]
+    },
+    {
+      "id": "salate",
+      "title": "Salate",
+      "subtitle": "mit Pizzabrot und Sauce",
+      "items": [
+        { "nr": "14", "name": "Insalata Mista", "desc": "Tomaten, Gurken, Oliven, Eisberg, Paprika, Zwiebeln", "price": 8.5 },
+        { "nr": "15", "name": "Insalata Italia", "desc": "Mais, Tomaten, Gurken, Eisberg, Paprika, Zwiebeln, Käse, Karotten", "price": 9.5 },
+        { "nr": "16", "name": "Türkischer Hirtensalat", "desc": "Tomaten, Gurken, Zwiebeln, Paprika, Weichkäse, Oliven, Essig-Öl", "price": 9.5 },
+        { "nr": "17", "name": "Insalata Kebap Haus", "desc": "Eisberg, Oliven, Karotten, Weichkäse, Krautsalat, Zwiebeln, Gurken, Ei, Tomaten", "price": 9.0 },
+        { "nr": "18", "name": "Insalata Festival", "desc": "Eisberg, Tomaten, Eier, Gurken, Thunfisch, Schinken, Käse, Zwiebeln", "price": 9.5 },
+        { "nr": "19", "name": "Insalata Fantasia", "desc": "Eisberg, Tomaten, Eier, Garnelen, Thunfisch, Paprika, Zwiebeln", "price": 9.5 },
+        { "nr": "20", "name": "Insalata Hawaii", "desc": "Eisberg, Tomaten, Mais, Zwiebeln, Ananas, Eier, Gurken, Schinken, Käse", "price": 9.5 },
+        { "nr": "21", "name": "Insalata Tonno", "desc": "Eisberg, Thunfisch, Tomaten, Käse, Eier, Gurken, Zwiebeln", "price": 9.5 },
+        { "nr": "22", "name": "Insalata Sizilia", "desc": "Eisberg, Zwiebeln, Ei, Gurken, Schinken, Käse", "price": 9.0 },
+        { "nr": "23", "name": "Insalata Kruft", "desc": "Drehspießfleisch, Eisberg, Zwiebeln, Gurken, Weichkäse", "price": 10.0 },
+        { "nr": "24", "name": "Insalata Mozzarella", "desc": "Eisberg, Tomaten, Gurken, Mozzarella, Essig-Öl", "price": 9.0 },
+        { "nr": "25", "name": "Insalata Pollo", "desc": "Eisberg, Gurken, Hähnchenbrust, Tomaten, Zwiebeln, Essig-Öl", "price": 10.0 },
+        { "nr": "26", "name": "Insalata Chef", "desc": "Hähnchenbrust, Käse, Eisberg, Tomaten, Gurken, Zwiebeln, Paprika", "price": 11.0 }
+      ]
+    },
+    {
+      "id": "pizza",
+      "title": "Pizza",
+      "subtitle": "alle mit Tomatensauce & Käse",
+      "items": [
+        { "nr": "27", "name": "Kinder-Pizza", "desc": "", "price": 5.0 },
+        { "nr": "28", "name": "Pizza Andoriyas", "desc": "mini Familienpizza", "price": 13.0 },
+        { "nr": "29", "name": "Pizza Margherita", "desc": "", "price": 8.0 },
+        { "nr": "30", "name": "Pizza Salami", "desc": "", "price": 8.5 },
+        { "nr": "31", "name": "Pizza Prosciutto", "desc": "mit Schinken", "price": 8.5 },
+        { "nr": "32", "name": "Pizza Funghi", "desc": "mit Champignons", "price": 8.5 },
+        { "nr": "33", "name": "Pizza Cipolla", "desc": "mit Zwiebeln", "price": 8.5 },
+        { "nr": "34", "name": "Pizza Sucuk", "desc": "mit Sucuk", "price": 8.5 },
+        { "nr": "35", "name": "Pizza Tonno", "desc": "mit Thunfisch", "price": 8.5 },
+        { "nr": "36", "name": "Pizza Capricciosa", "desc": "Artischocken, Champignons", "price": 9.0 },
+        { "nr": "37", "name": "Pizza Funghi Salami", "desc": "Rindfleischsalami, Champignons", "price": 9.0 },
+        { "nr": "38", "name": "Pizza Funghi Prosciutto", "desc": "Champignons, Schinken", "price": 9.5 },
+        { "nr": "39", "name": "Pizza Calzone", "desc": "Pilze, Rindfleischsalami, Schinken", "price": 9.5 },
+        { "nr": "40", "name": "Pizza Funghi Tonno", "desc": "Thunfisch, Champignons", "price": 9.5 },
+        { "nr": "41", "name": "Pizza Tonno Cipolla", "desc": "Thunfisch, Zwiebeln", "price": 9.5 },
+        { "nr": "42", "name": "Pizza Hawaii", "desc": "Ananas, Schinken", "price": 9.0 },
+        { "nr": "43", "name": "Pizza Italia", "desc": "Pilze, Salami, Schinken", "price": 9.5 },
+        { "nr": "44", "name": "Pizza Mafa", "desc": "Paprika, Champignons, Knoblauch, Peperoni", "price": 9.5 },
+        { "nr": "45", "name": "Pizza ala Funghi", "desc": "Hollandaise, Champignons, Käse", "price": 9.5 },
+        { "nr": "46", "name": "Pizza Amigo", "desc": "Hackfleisch, Petersilie, Zwiebeln, Paprika", "price": 9.5 },
+        { "nr": "47", "name": "Pizza Rucola", "desc": "Rucola, Truthahnschinken, Cherrytomaten", "price": 9.5 },
+        { "nr": "48", "name": "Pizza Roma", "desc": "Rindfleischsalami, Thunfisch, Schinken, Paprika", "price": 9.5 },
+        { "nr": "49", "name": "Pizza Diavolo", "desc": "Rindfleischsalami, Pilze, Paprika", "price": 10.0 },
+        { "nr": "50", "name": "Pizza Fantasia", "desc": "Schinken, Salami, Oliven", "price": 10.0 },
+        { "nr": "51", "name": "Pizza Speziale", "desc": "Spiegelei, Pilze, Artischocken, Schinken", "price": 10.0 },
+        { "nr": "52", "name": "Pizza Piccolo", "desc": "Zwiebeln, Peperoni, Champignons, Schinken, Paprika, Eier", "price": 10.0 },
+        { "nr": "53", "name": "Pizza Europa", "desc": "Rindfleischsalami, Schinken, Thunfisch, Scampi, Gorgonzola", "price": 9.5 },
+        { "nr": "54", "name": "Pizza Ransbach", "desc": "Thunfisch, Zwiebeln, Scampi, Gorgonzola", "price": 9.5 },
+        { "nr": "55", "name": "Pizza Jamaika", "desc": "Spinat, Mais, Zwiebeln, Weichkäse", "price": 10.0 },
+        { "nr": "56", "name": "Pizza Mozzarella", "desc": "Tomaten, Mozzarella", "price": 9.5 },
+        { "nr": "57", "name": "Pizza Sardellen", "desc": "Knoblauch, Zwiebeln, Peperoni, Sardellen", "price": 9.5 },
+        { "nr": "58", "name": "Pizza Scampi", "desc": "Garnelen, Knoblauch", "price": 9.5 },
+        { "nr": "59", "name": "Pizza Holland", "desc": "Hollandaise, Peperoni, Zwiebeln, Pilze, Broccoli", "price": 9.5 },
+        { "nr": "60", "name": "Pizza Kebap", "desc": "mit Drehspießfleisch", "price": 10.0 },
+        { "nr": "61", "name": "Pizza Onkel", "desc": "Thunfisch, Zwiebeln, Drehspießfleisch", "price": 11.0 },
+        { "nr": "62", "name": "Pizza KurftSpezial", "desc": "Drehspießfleisch, Zwiebeln, Tomaten, Weichkäse", "price": 11.0 },
+        { "nr": "63", "name": "Pizza Calzone Spezial", "desc": "mit Drehspießfleisch", "price": 10.0 },
+        { "nr": "64", "name": "Pizza Boss", "desc": "Drehspießfleisch, Pommes, Tzatziki", "price": 12.0 },
+        { "nr": "65", "name": "Pizza Spaghetti", "desc": "Hackfleischsauce, Spaghetti", "price": 9.0 },
+        { "nr": "66", "name": "Pizza Mama Mia", "desc": "Hollandaise, Käse, Hähnchenbrust, Zwiebeln", "price": 10.0 },
+        { "nr": "67", "name": "Pizza Montana", "desc": "Hackfleischsauce, Broccoli, Hähnchenbrust, Käse", "price": 10.0 },
+        { "nr": "68", "name": "Pizza Perverso", "desc": "Fleischsauce, Käse, Spaghetti, Hähnchenbrust, Salat, Sauce", "price": 11.0 },
+        { "nr": "69", "name": "Pizza Del Sol", "desc": "Hackfleischsauce, Hollandaise, Broccoli, Hähnchenbrust", "price": 10.0 },
+        { "nr": "70", "name": "Pizza Ahmed", "desc": "Sucuk, Champignons (scharf)", "price": 9.0 },
+        { "nr": "71", "name": "Pizza Troya", "desc": "Sucuk, Champignons, Zwiebeln, Thunfisch", "price": 9.5 },
+        { "nr": "72", "name": "Pizza Holland Spezial", "desc": "Hollandaise, Hähnchendrehspieß, Champignons, Zwiebeln", "price": 11.5 },
+        { "nr": "73", "name": "Pizza Calzone Giro", "desc": "Drehspießfleisch, Weichkäse, Zwiebeln, Peperoni, Tzatziki", "price": 11.0 },
+        { "nr": "74", "name": "Chilli-Cheese Döner Pizza", "desc": "Drehspießfleisch, Rucola, Chilli-Cheesesauce, Jalapeños", "price": 11.0 },
+        { "nr": "75", "name": "Chilli-Cheese Pizza", "desc": "Drehspießfleisch, Chilli-Cheesesauce, Jalapeños", "price": 11.0 },
+        { "nr": "76", "name": "Pizza Quattro Stagioni", "desc": "Paprika, Pilze, Artischocken, Zwiebeln, Käse", "price": 9.5 },
+        { "nr": "77", "name": "Pizza al Vegetale", "desc": "Broccoli, Spinat, Zwiebeln", "price": 9.5 },
+        { "nr": "78", "name": "Pizza Genove", "desc": "Broccoli, Spinat, Zwiebeln", "price": 9.5 },
+        { "nr": "79", "name": "Pizza Spinaci", "desc": "Spinat, Ei, Zwiebeln", "price": 9.5 },
+        { "nr": "80", "name": "Pizza Broccoli", "desc": "mit Broccoli", "price": 9.5 },
+        { "nr": "81", "name": "Pizza Kentucky", "desc": "Hollandaise, Mais, Broccoli, Drehspießfleisch", "price": 9.5 },
+        { "nr": "82", "name": "Pizza Rakkas", "desc": "Hollandaise, Zwiebeln, Drehspießfleisch", "price": 9.5 },
+        { "nr": "Fam", "name": "Familienpizza Margherita 40x60", "desc": "", "price": 25.0 },
+        { "nr": "Fam+", "name": "Familienpizza ab", "desc": "weitere Beläge", "price": 26.0 }
+      ]
+    },
+    {
+      "id": "big-americans",
+      "title": "Pizza Big Americans",
+      "subtitle": "NEU · je 12,00 €",
+      "items": [
+        { "nr": "A1", "name": "New York", "desc": "Hollandaise, Spargel, Schinken, Broccoli", "price": 12.0 },
+        { "nr": "A2", "name": "Big Miami", "desc": "Barbecuesauce, Tonno, Schinken, Ananas", "price": 12.0 },
+        { "nr": "A3", "name": "Big Texas", "desc": "Barbecuesauce, Peperoniwurst, Paprika, Kapern", "price": 12.0 },
+        { "nr": "A4", "name": "Big Boston", "desc": "Sahnesauce, Putenbrust, Broccoli, Fungi", "price": 12.0 },
+        { "nr": "A5", "name": "Big Philadelphia", "desc": "Barbecuesauce, Salami, Schinken, Spinat, Zwiebeln, Ei", "price": 12.0 },
+        { "nr": "A6", "name": "Big Vegas", "desc": "Sahnesauce, Broccoli, frische Tomaten, Oliven, Zwiebeln", "price": 12.0 }
+      ]
+    },
+    {
+      "id": "nudeln",
+      "title": "Nudelgerichte",
+      "subtitle": "mit hausgemachten Brötchen",
+      "items": [
+        { "nr": "83", "name": "Rigatoni / Tortellini / Spaghetti al Forno", "desc": "Hackfleischsauce & Käse", "price": 9.5 },
+        { "nr": "84", "name": "Rigatoni Memo", "desc": "Hackfleischsauce, Käse, Garnelen, Pilze", "price": 9.5 },
+        { "nr": "85", "name": "Kombination al Forno", "desc": "", "price": 9.5 },
+        { "nr": "86", "name": "Kombination al Forno Kebab", "desc": "Hackfleischsauce, Käse, Drehspießfleisch", "price": 9.5 },
+        { "nr": "87", "name": "Gnocchi al Forno", "desc": "Hackfleischsauce & Käse", "price": 10.5 },
+        { "nr": "88", "name": "Spaghetti Curry", "desc": "NEU · Hähnchenbrust, Curry, Sahnesauce", "price": 10.0 },
+        { "nr": "89", "name": "Spaghetti deluxe", "desc": "NEU · Sahne, Broccoli, Spinat, Lachs, Curry", "price": 10.0 },
+        { "nr": "90", "name": "Spaghetti Mexiko", "desc": "NEU · Hackfleischsauce, Paprika, rote Zwiebeln, Pilze, Jalapeño", "price": 10.0 },
+        { "nr": "91", "name": "Spaghetti Carbonara", "desc": "Sahne, Schinken, Spiegelei", "price": 9.5 },
+        { "nr": "92", "name": "Spaghetti Bologna", "desc": "Hackfleischsauce", "price": 8.5 },
+        { "nr": "93", "name": "Spaghetti Napoli", "desc": "Tomatensauce", "price": 8.5 },
+        { "nr": "94", "name": "Spaghetti Scampoli", "desc": "Tomatensauce, Garnelen, Knoblauch", "price": 9.5 },
+        { "nr": "97", "name": "Rigatoni Curry", "desc": "NEU · Hähnchenbrust, Curry, Sahnesauce", "price": 10.0 },
+        { "nr": "98", "name": "Rigatoni deluxe", "desc": "NEU · Sahne, Broccoli, Spinat, Lachs, Curry", "price": 10.0 },
+        { "nr": "99", "name": "Rigatoni Mexiko", "desc": "NEU · Hackfleischsauce, Paprika, Zwiebeln, Pilze, Jalapeños", "price": 10.0 },
+        { "nr": "100", "name": "Rigatoni Bologna", "desc": "Hackfleischsauce", "price": 9.0 },
+        { "nr": "101", "name": "Rigatoni Napoli", "desc": "Tomatensauce", "price": 8.5 },
+        { "nr": "102", "name": "Rigatoni Arrabbiata", "desc": "Tomatensauce, Drehspießfleisch, Weichkäse, Peperoni, Zwiebeln", "price": 10.0 },
+        { "nr": "103", "name": "Rigatoni Hollandaise", "desc": "Hollandaise, Käse-Sahnesauce", "price": 11.0 },
+        { "nr": "104", "name": "Rigatoni Sizilia", "desc": "Sahne, Pilze, Eier, Schinken", "price": 9.5 },
+        { "nr": "105", "name": "Rigatoni Quattro Formaggi", "desc": "Sahnesauce & 4 Käsesorten", "price": 9.5 },
+        { "nr": "106", "name": "Rigatoni Di Pollo", "desc": "Sahne, Hähnchenbrust, Broccoli", "price": 10.0 },
+        { "nr": "107", "name": "Rigatoni Keno", "desc": "Hähnchenbrust, Tomatensauce, frische Pilze", "price": 10.0 },
+        { "nr": "108", "name": "Tortellini Curry", "desc": "NEU · Hähnchenbrust, Curry, Sahnesauce", "price": 10.0 },
+        { "nr": "109", "name": "Tortellini deluxe", "desc": "NEU · Sahne, Broccoli, Spinat, Lachs, Curry", "price": 10.0 },
+        { "nr": "110", "name": "Tortellini Bologna", "desc": "Hackfleischsauce", "price": 9.5 },
+        { "nr": "111", "name": "Tortellini Napoli", "desc": "Tomatensauce", "price": 9.0 },
+        { "nr": "112", "name": "Tortellini Alla Panna", "desc": "Sahnesauce & Schinken", "price": 9.5 },
+        { "nr": "113", "name": "Tortellini Alla Crema", "desc": "Gorgonzola, Sahne, Pilze", "price": 10.0 },
+        { "nr": "114", "name": "Tortellini Quattro Formaggi", "desc": "Sahne & 4 Käsesorten", "price": 10.0 },
+        { "nr": "115", "name": "Tortellini Alla Cici", "desc": "Sahne, Broccoli, Spinat", "price": 9.5 },
+        { "nr": "116", "name": "Tortellini Mexiko", "desc": "NEU · Hackfleischsauce, Paprika, Zwiebeln, Pilze, Jalapeños", "price": 10.0 },
+        { "nr": "118", "name": "Gnocchi Napoli", "desc": "Tomatensauce", "price": 8.5 },
+        { "nr": "119", "name": "Gnocchi Bologna", "desc": "Hackfleischsauce", "price": 8.5 },
+        { "nr": "120", "name": "Gnocchi Alla Panna", "desc": "Sahnesauce & Schinken", "price": 9.5 },
+        { "nr": "121", "name": "Gnocchi Quattro Formaggi", "desc": "Sahnesauce & 4 Käsesorten", "price": 9.5 },
+        { "nr": "122", "name": "Gnocchi Di Pollo", "desc": "Sahne, Hähnchenbrust, Spinat, Broccoli", "price": 10.0 }
+      ]
+    },
+    {
+      "id": "pide",
+      "title": "Pide",
+      "items": [
+        { "nr": "125", "name": "Pide Sucuk", "desc": "türkische Knoblauchwurst, Käse", "price": 9.0 },
+        { "nr": "126", "name": "Pide Käse", "desc": "", "price": 9.0 },
+        { "nr": "127", "name": "Pide Vegetarisch", "desc": "Pilze, Zwiebeln, Spinat, Paprika", "price": 9.5 },
+        { "nr": "128", "name": "Pide Drehspießfleisch", "desc": "Kalb- oder Hähnchenfleisch", "price": 10.5 },
+        { "nr": "129", "name": "Pide Oliven", "desc": "Oliven, Weichkäse, Gouda, Tomaten", "price": 9.5 },
+        { "nr": "130", "name": "Pide Chili Cheese", "desc": "NEU · Hähnchendöner, Chilisauce, Mais, Paprika", "price": 10.0 }
+      ]
+    },
+    {
+      "id": "schnitzel",
+      "title": "Schnitzelgerichte",
+      "subtitle": "alle mit Pommes oder Kroketten und Salat",
+      "items": [
+        { "nr": "134", "name": "König Schnitzel", "desc": "Hollandaise, Schinken, Broccoli & Käse überbacken", "price": 13.0 },
+        { "nr": "135", "name": "Schnitzel Venezia", "desc": "gebratene Zwiebeln, Pilze", "price": 10.0 },
+        { "nr": "136", "name": "Jägerschnitzel", "desc": "mit Jägersauce", "price": 10.5 },
+        { "nr": "137", "name": "Paprikaschnitzel", "desc": "mit Paprikasauce", "price": 10.5 },
+        { "nr": "138", "name": "Schnitzel Wiener Art", "desc": "", "price": 10.0 },
+        { "nr": "139", "name": "Schnitzel al Forno", "desc": "Hackfleischsauce & Käse überbacken", "price": 12.0 },
+        { "nr": "140", "name": "Schnitzel Hawaii", "desc": "Sahnesauce, Käse, Schinken, Ananas", "price": 12.0 },
+        { "nr": "141", "name": "Cipolla-Rahm", "desc": "Zwiebeln und Rahmsauce", "price": 10.5 },
+        { "nr": "142", "name": "Schnitzel Gorgonzola", "desc": "Gorgonzolasauce & Käse", "price": 11.5 },
+        { "nr": "143", "name": "Schnitzel Italia", "desc": "Sahnesauce, Käse, Schinken, Pilze", "price": 12.0 },
+        { "nr": "144", "name": "Schnitzel Broccoli", "desc": "Broccoli und Sahne überbacken", "price": 12.0 }
+      ]
+    },
+    {
+      "id": "burger",
+      "title": "Burger",
+      "subtitle": "mit Zwiebeln, Gurken, Tomaten, Salat",
+      "items": [
+        { "nr": "145A", "name": "Burger 100 gr", "desc": "Salat, Gurken, Tomaten, Zwiebeln", "price": 5.5 },
+        { "nr": "145B", "name": "Cheese Burger 100 gr", "desc": "", "price": 5.5 },
+        { "nr": "145C", "name": "Chili Cheese Burger 100 gr", "desc": "mit Jalapeños", "price": 5.5 },
+        { "nr": "146", "name": "Chicken Burger", "desc": "NEU · Pommes, Tomaten, Eisberg, Jalapeños, Käsesauce", "price": 10.0 },
+        { "nr": "147", "name": "Adana Burger", "desc": "Pommes, Rucola, BBQ, Schmelzkäse, Tomaten, Jalapeños, rote Zwiebeln", "price": 10.0 },
+        { "nr": "148", "name": "Burger des Hauses", "desc": "mit Pommes · Spiegelei, Rucola, Gurken, Zwiebeln, Senfsauce", "price": 10.0 },
+        { "nr": "149", "name": "Chilli-Cheese-Burger", "desc": "mit Pommes · Jalapeños, Käsesauce, Salat, Gurken, Tomaten", "price": 11.0 },
+        { "nr": "150", "name": "Burger Menü", "desc": "Pommes + Getränk", "price": 10.0 },
+        { "nr": "151", "name": "Amerikanische Menü", "desc": "Burger + Nuggets + Wings + Pommes + Getränk", "price": 15.0 }
+      ]
+    },
+    {
+      "id": "grill",
+      "title": "Grillgerichte",
+      "subtitle": "NEU",
+      "items": [
+        { "nr": "G1", "name": "Kuzu Şiş", "desc": "Lammspieß mit Salat, Pommes oder Reis", "price": 18.0 },
+        { "nr": "G2", "name": "Tavuk Şiş", "desc": "Hähnchenspieß mit Salat, Pommes oder Reis", "price": 16.0 },
+        { "nr": "G3", "name": "Kuzu Pirzola", "desc": "Lammkotelett mit Salat, Pommes oder Reis", "price": 20.0 },
+        { "nr": "G4", "name": "Karışık Izgara", "desc": "Gemischter Grillteller mit Pommes/Reis", "price": 23.0 },
+        { "nr": "G5", "name": "Hähnchenspieß Rolle", "desc": "mit Mix-Salat", "price": 10.0 },
+        { "nr": "G6", "name": "Lammspieß Rolle", "desc": "mit Mix-Salat", "price": 11.0 },
+        { "nr": "G7", "name": "Adana Rolle", "desc": "mit Mix-Salat", "price": 10.0 },
+        { "nr": "G8", "name": "Lahmacun Teller", "desc": "mit Dönerfleisch und Salat", "price": 12.0 },
+        { "nr": "G9", "name": "Grill Burger", "desc": "mit Pommes", "price": 10.0 },
+        { "nr": "G10", "name": "Hähnchensteak klassisch", "desc": "Mix-Salat, Pommes, Zitrone", "price": 15.0 },
+        { "nr": "G11", "name": "Hähnchensteak Hollandaise", "desc": "Salat, Pommes, Broccoli, Sahne- & Hollandaisesauce", "price": 15.0 },
+        { "nr": "G12", "name": "Hähnchensteak Curry", "desc": "Broccoli, Paprika in Curry-Sahne, Pommes, Salat", "price": 15.0 }
+      ]
+    },
+    {
+      "id": "pfanne",
+      "title": "Pfannengerichte",
+      "subtitle": "NEU",
+      "items": [
+        { "nr": "P1", "name": "Hähnchenpfanne", "desc": "Rahmsauce, Hähnchenbrust, Pilze, Zwiebeln, Paprika", "price": 12.0 },
+        { "nr": "P2", "name": "Dilan Pfanne", "desc": "Hähnchenbruststreifen, Pilze, Broccoli, rote Zwiebeln, Tomatensauce", "price": 12.0 },
+        { "nr": "P3", "name": "Polo Verdura", "desc": "Hähnchenbruststreifen, Broccoli, Paprika, Curry-Sahne", "price": 12.0 },
+        { "nr": "P4", "name": "Mexikanische Pfanne", "desc": "Hähnchenbrust, Paprika, rote Zwiebeln, Jalapeños, Hackfleischsauce", "price": 12.0 }
+      ]
+    },
+    {
+      "id": "beilagen",
+      "title": "Frische Beilagen",
+      "items": [
+        { "nr": "153", "name": "Kräuterbutter mit Pizzabrötchen", "desc": "", "price": 4.0 },
+        { "nr": "154", "name": "Pizzabrötchen", "desc": "", "price": 1.5 },
+        { "nr": "155", "name": "Beilagensalat", "desc": "", "price": 4.0 },
+        { "nr": "156", "name": "Portion Tzatziki", "desc": "", "price": 1.5 },
+        { "nr": "157", "name": "Portion Salatsauce", "desc": "", "price": 1.5 },
+        { "nr": "158", "name": "Portion Pommes", "desc": "", "price": 4.0 },
+        { "nr": "159", "name": "Portion Peperoni", "desc": "", "price": 3.5 },
+        { "nr": "160", "name": "Portion Kroketten", "desc": "", "price": 4.0 },
+        { "nr": "161", "name": "Ketchup oder Mayonnaise", "desc": "", "price": 0.5 },
+        { "nr": "162a", "name": "Hummus klein", "desc": "", "price": 4.0 },
+        { "nr": "162b", "name": "Hummus groß", "desc": "", "price": 6.0 },
+        { "nr": "163", "name": "Wings (8 Stk.)", "desc": "", "price": 6.5 },
+        { "nr": "164", "name": "Wings Menü", "desc": "Pommes + Getränk", "price": 10.0 },
+        { "nr": "165", "name": "Nuggets (8 Stk.)", "desc": "", "price": 6.5 },
+        { "nr": "166", "name": "Nuggets Menü", "desc": "Pommes + Getränk", "price": 10.0 }
+      ]
+    },
+    {
+      "id": "dessert",
+      "title": "Dessert",
+      "items": [
+        { "nr": "167", "name": "Tiramisu", "desc": "", "price": 5.0 },
+        { "nr": "168", "name": "Tartufo", "desc": "", "price": 5.0 },
+        { "nr": "169", "name": "Coppa Mousse Cheesecake", "desc": "", "price": 5.0 }
+      ]
+    },
+    {
+      "id": "getraenke",
+      "title": "Getränke",
+      "items": [
+        { "nr": "G-W", "name": "Wasser 0,33 l", "desc": "", "price": 2.0 },
+        { "nr": "G-A", "name": "Ayran 0,33 l", "desc": "", "price": 2.0 },
+        { "nr": "G-C05", "name": "Cola / Fanta / Ice Tea / Cola Light 0,5 l", "desc": "", "price": 2.5 },
+        { "nr": "G-C10", "name": "Cola / Fanta / Ice Tea / Cola Light 1,0 l", "desc": "", "price": 3.5 },
+        { "nr": "G-M05", "name": "Mezzo Mix / Gazoza 0,5 l", "desc": "", "price": 2.5 },
+        { "nr": "G-M10", "name": "Mezzo Mix / Gazoza 1,0 l", "desc": "", "price": 3.5 },
+        { "nr": "G-BK", "name": "Bier klein", "desc": "", "price": 2.5 },
+        { "nr": "G-BG", "name": "Bier groß", "desc": "", "price": 3.5 }
+      ]
+    }
+  ]
+}
