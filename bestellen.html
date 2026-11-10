@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=v17" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=v18" />
   <style>
     .hud-aurora, .hud-hex, .hud-crt, .hud-scan-h, .hud-scan-h2, .hud-scan-v, .knx-stream { display: none !important; }
     #hud-canvas { z-index: 0 !important; }
@@ -152,6 +152,58 @@
       transition: opacity 0.2s ease;
     }
     .toast-add.show { opacity: 1; }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(57, 215, 232, 0.08);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font: inherit;
+    }
+    .chip.on {
+      background: rgba(57, 215, 232, 0.24);
+      border-color: var(--line-strong);
+      color: var(--accent);
+    }
+    .sauce-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .sauce-grid select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.28);
+      color: var(--text);
+      padding: 12px 12px;
+      font: inherit;
+      font-size: 0.95rem;
+    }
+    .doner-box {
+      display: none;
+      margin-top: 4px;
+      padding: 10px 12px;
+      border: 1px solid rgba(57, 215, 232, 0.18);
+      border-radius: 12px;
+      background: rgba(57, 215, 232, 0.06);
+    }
+    .doner-box.show { display: block; }
+    .doner-box .sub {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.3;
+    }
   </style>
   <script>
     (function () {
@@ -163,9 +215,9 @@
         .then(function (data) {
           var active = data && data.id ? String(data.id) : "";
           if (!active) return;
-          if (current !== active || params.get("v") !== "17") {
+          if (current !== active || params.get("v") !== "18") {
             location.replace(
-              location.pathname + "?r=" + encodeURIComponent(active) + "&v=17"
+              location.pathname + "?r=" + encodeURIComponent(active) + "&v=18"
             );
           }
         })
@@ -243,11 +295,76 @@
       const active = await getActiveRoundId();
       if (!active) throw new Error("Keine offene Bestellrunde");
       id = active;
-      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=17`;
+      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=18`;
       if (location.pathname + location.search !== next) {
         history.replaceState(null, "", next);
       }
       return id;
+    }
+
+    const EXTRAS = [
+      "Jalapeños",
+      "Chilisauce",
+      "Extra Käse",
+      "Extra Fleisch",
+      "Peperoni",
+      "Doppel scharf",
+      "Ohne Zwiebeln",
+      "Ohne Salat",
+      "Extra Mais"
+    ];
+    const SAUCES = [
+      "Knoblauchsauce",
+      "Kräutersauce",
+      "Scharfe Sauce",
+      "Cocktail-Sauce",
+      "Tzatziki",
+      "Joghurtsauce",
+      "Ohne Sauce"
+    ];
+
+    function isDonerDish(name) {
+      const n = String(name || "").toLowerCase();
+      if (!n) return false;
+      if (n.includes("pizza") || n.includes("pide") || n.includes("salat") || n.includes("nugget")) return false;
+      return /döner|drehspieß|doner|kebab/.test(n) || /\brolle\b/.test(n);
+    }
+
+    function sauceOptions(selected) {
+      return SAUCES.map((s) =>
+        `<option value="${s}"${s === selected ? " selected" : ""}>${s}</option>`
+      ).join("");
+    }
+
+    function buildExtras(selected = []) {
+      return EXTRAS.map((extra) => {
+        const on = selected.includes(extra) ? " on" : "";
+        return `<button type="button" class="chip${on}" data-extra="${extra}">${extra}</button>`;
+      }).join("");
+    }
+
+    function composeNote(row) {
+      const parts = [];
+      const beilagen = row.querySelector(".beilagen").value.trim();
+      if (beilagen) parts.push(`Beilagen: ${beilagen}`);
+      const extras = [...row.querySelectorAll(".chip.on")].map((el) => el.dataset.extra);
+      if (extras.length) parts.push(`Zusatz: ${extras.join(", ")}`);
+      if (isDonerDish(row.querySelector(".dish").value) && row.querySelector(".doner-box").classList.contains("show")) {
+        const top = row.querySelector(".sauce-top").value;
+        const bottom = row.querySelector(".sauce-bottom").value;
+        if (top) parts.push(`Sauce oben: ${top}`);
+        if (bottom) parts.push(`Sauce unten: ${bottom}`);
+        if (top && bottom && top !== bottom) {
+          parts.push("Döner voll mit Sauce (oben + unten)");
+        }
+      }
+      return parts.join(" · ");
+    }
+
+    function syncDonerBox(row) {
+      const box = row.querySelector(".doner-box");
+      if (isDonerDish(row.querySelector(".dish").value)) box.classList.add("show");
+      else box.classList.remove("show");
     }
 
     function itemRow(preset = null) {
@@ -271,8 +388,25 @@
           <button class="btn btn-danger btn-small remove" type="button">×</button>
         </div>
         <div class="field span-all">
-          <label>Bemerkung</label>
-          <input class="note" name="dish_note" maxlength="160" placeholder="optional" autocomplete="off" />
+          <label>Beilagen</label>
+          <input class="beilagen" name="dish_beilagen" maxlength="200" placeholder="was auf dem Gericht ist" autocomplete="off" />
+        </div>
+        <div class="field span-all">
+          <label>Zusatz</label>
+          <div class="chip-row extras">${buildExtras()}</div>
+        </div>
+        <div class="field span-all doner-box">
+          <p class="sub">Nur Döner: Sauce oben und unten – damit der Döner voll mit Sauce ist.</p>
+          <div class="sauce-grid">
+            <div>
+              <label>Sauce oben</label>
+              <select class="sauce-top">${sauceOptions("Knoblauchsauce")}</select>
+            </div>
+            <div>
+              <label>Sauce unten</label>
+              <select class="sauce-bottom">${sauceOptions("Kräutersauce")}</select>
+            </div>
+          </div>
         </div>
       `;
       wrap.querySelector(".remove").addEventListener("click", () => {
@@ -280,18 +414,28 @@
           wrap.querySelector(".dish").value = "";
           wrap.querySelector(".qty").value = "1";
           wrap.querySelector(".price").value = "";
-          wrap.querySelector(".note").value = "";
+          wrap.querySelector(".beilagen").value = "";
+          wrap.querySelectorAll(".chip.on").forEach((el) => el.classList.remove("on"));
+          syncDonerBox(wrap);
         } else {
           wrap.remove();
         }
         updateSubtotal();
       });
-      wrap.querySelectorAll("input").forEach((input) => input.addEventListener("input", updateSubtotal));
+      wrap.querySelector(".dish").addEventListener("input", () => syncDonerBox(wrap));
+      wrap.querySelectorAll(".chip").forEach((chip) => {
+        chip.addEventListener("click", () => chip.classList.toggle("on"));
+      });
+      wrap.querySelectorAll("input, select").forEach((input) => {
+        input.addEventListener("input", updateSubtotal);
+        input.addEventListener("change", updateSubtotal);
+      });
       if (preset) {
         wrap.querySelector(".dish").value = preset.name || "";
         wrap.querySelector(".price").value = preset.price != null ? String(preset.price) : "";
-        wrap.querySelector(".note").value = preset.note || "";
+        wrap.querySelector(".beilagen").value = preset.note || preset.beilagen || "";
         wrap.querySelector(".qty").value = String(preset.qty || 1);
+        syncDonerBox(wrap);
       }
       return wrap;
     }
@@ -301,7 +445,7 @@
         name: row.querySelector(".dish").value.trim(),
         qty: Number(row.querySelector(".qty").value || 1),
         price: money(row.querySelector(".price").value || 0),
-        note: row.querySelector(".note").value.trim()
+        note: composeNote(row)
       })).filter((item) => item.name);
     }
 
@@ -326,8 +470,10 @@
       if (!emptyRows[0]) itemsBox.appendChild(row);
       row.querySelector(".dish").value = label;
       row.querySelector(".price").value = String(item.price ?? "");
-      if (item.desc) row.querySelector(".note").value = item.desc;
+      row.querySelector(".beilagen").value = item.desc || "";
       row.querySelector(".qty").value = "1";
+      row.querySelectorAll(".chip.on").forEach((el) => el.classList.remove("on"));
+      syncDonerBox(row);
       updateSubtotal();
       showToast(`+ ${label}`);
       document.getElementById("send").scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -390,7 +536,7 @@
 
     async function loadMenu() {
       try {
-        const res = await fetch("./js/menu-rathaus.json?v=17", { cache: "no-store" });
+        const res = await fetch("./js/menu-rathaus.json?v=18", { cache: "no-store" });
         if (!res.ok) throw new Error("Menü nicht ladbar");
         menuData = await res.json();
         document.getElementById("menuNote").textContent =
