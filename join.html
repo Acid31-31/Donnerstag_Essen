@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/alien-hud.css?v=v18" />
+  <link rel="stylesheet" href="css/alien-hud.css?v=v20" />
   <style>
     .hud-aurora, .hud-hex, .hud-crt, .hud-scan-h, .hud-scan-h2, .hud-scan-v, .knx-stream { display: none !important; }
     #hud-canvas { z-index: 0 !important; }
@@ -215,9 +215,9 @@
         .then(function (data) {
           var active = data && data.id ? String(data.id) : "";
           if (!active) return;
-          if (current !== active || params.get("v") !== "19") {
+          if (current !== active || params.get("v") !== "20") {
             location.replace(
-              location.pathname + "?r=" + encodeURIComponent(active) + "&v=19"
+              location.pathname + "?r=" + encodeURIComponent(active) + "&v=20"
             );
           }
         })
@@ -295,7 +295,7 @@
       const active = await getActiveRoundId();
       if (!active) throw new Error("Keine offene Bestellrunde");
       id = active;
-      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=19`;
+      const next = `${location.pathname}?r=${encodeURIComponent(id)}&v=20`;
       if (location.pathname + location.search !== next) {
         history.replaceState(null, "", next);
       }
@@ -569,7 +569,7 @@
 
     async function loadMenu() {
       try {
-        const res = await fetch("./js/menu-rathaus.json?v=19", { cache: "no-store" });
+        const res = await fetch("./js/menu-rathaus.json?v=20", { cache: "no-store" });
         if (!res.ok) throw new Error("Menü nicht ladbar");
         menuData = await res.json();
         document.getElementById("menuNote").textContent =
