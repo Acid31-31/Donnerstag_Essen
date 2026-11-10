@@ -502,7 +502,10 @@
       row.querySelector(".price").value = String(item.price ?? "");
       row.querySelector(".beilagen").value = item.desc || "";
       row.querySelector(".qty").value = "1";
-      row.querySelectorAll(".chip.on").forEach((el) => el.classList.remove("on"));
+      row.querySelectorAll(".extras .chip.on").forEach((el) => el.classList.remove("on"));
+      row.querySelectorAll(".meat-chip").forEach((el) => {
+        el.classList.toggle("on", el.dataset.meat === "Gemischt");
+      });
       syncDonerBox(row);
       updateSubtotal();
       showToast(`+ ${label}`);
